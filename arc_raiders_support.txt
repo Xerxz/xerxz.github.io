@@ -1,0 +1,19 @@
+🗺️ Arc Raiders Interactive Map Guide
+
+Quickly navigate and conquer the surface with your in-game map!
+1. Finding Materials 💎
+
+Your map is your best tool for material scavenging:
+
+    Filter/Toggle: Use the map to toggle on icons for material.
+
+    Zoom In: Zoom in on regions you plan to traverse. Materials are often clustered near points of interest or distinct geographical features.
+
+
+2. Tracking Quests 🧭
+
+Stay focused on your objectives by actively using the map for quest tracking:
+
+    Active Quest Icon: The location of your currently Active Quest objective is usually marked by a distinct, icon
+
+    Select/Toggle Quest: Open your Quests/Objectives Log. Selecting a quest and selecting the Tracking button from the log will automatically update the map to show the target destination.
