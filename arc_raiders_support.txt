@@ -17,3 +17,5 @@ Stay focused on your objectives by actively using the map for quest tracking:
     Active Quest Icon: The location of your currently Active Quest objective is usually marked by a distinct, icon
 
     Select/Toggle Quest: Open your Quests/Objectives Log. Selecting a quest and selecting the Tracking button from the log will automatically update the map to show the target destination.
+
+For support join the Discord at: https://discord.gg/fEsVWsg5
