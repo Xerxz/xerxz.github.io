@@ -598,7 +598,8 @@
       background: var(--good);
       box-shadow: 0 0 8px var(--good);
     }
-    .dx-sync-dot.st-error { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
+    .dx-sync-dot.st-error   { background: var(--bad);  box-shadow: 0 0 8px var(--bad); }
+    .dx-sync-dot.st-pending { background: var(--warn); box-shadow: 0 0 8px var(--warn); animation: dx-spin 1.4s linear infinite; border-radius: 2px; }
     .dx-sync-name { font-size: 13px; font-weight: 500; color: var(--text); }
     .dx-sync-d { font-size: 11.5px; color: var(--text-mute); margin-top: 1px; }
     .dx-sync-time { font-size: 11.5px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
@@ -700,101 +701,44 @@ const CONFIG = {
 window.CONFIG = CONFIG;
 
 const APPS = [
-  { id: 'raiders', name: 'Raiders Companion', tag: 'GAME', cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.62 0.16 25)', glyph: 'R', desc: 'Strategy & loadout planner for Raiders.', rev30: 1842, inst30: 18420, dau: 3210, rating: 4.5, crash: 0.42 },
-  { id: 'chordpro', name: 'Chord Finder Pro', tag: 'MUSIC', cat: 'Music utility', platforms: ['android'], monet: 'Paid', color: 'oklch(0.68 0.14 200)', glyph: 'C+', desc: 'Reverse chord lookup & voicings for guitarists.', rev30: 962, inst30: 1240, dau: 880, rating: 4.7, crash: 0.18 },
-  { id: 'chord2', name: 'Chord Finder 2', tag: 'MUSIC', cat: 'Music utility', platforms: ['android','ios'], monet: 'Free + IAP', color: 'oklch(0.7 0.13 220)', glyph: 'C2', desc: 'Next-gen chord library with progressions & ear training.', rev30: 2104, inst30: 8600, dau: 2410, rating: 4.6, crash: 0.31 },
-  { id: 'tuner', name: 'Guitar Tuner', tag: 'MUSIC', cat: 'Music utility', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.72 0.13 160)', glyph: 'GT', desc: 'Pitch-perfect tuner with alt tunings.', rev30: 686, inst30: 22100, dau: 4900, rating: 4.4, crash: 0.55 },
-  { id: 'strat', name: 'Stratagems', tag: 'GAME', cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.74 0.14 75)', glyph: 'St', desc: 'Stratagem trainer & loadout reference.', rev30: 3420, inst30: 41200, dau: 9800, rating: 4.6, crash: 0.38 },
-  { id: 'stardew', name: 'Stardew Valley Map', tag: 'MAP', cat: 'Game map', platforms: ['android'], monet: 'Free + ads', color: 'oklch(0.74 0.13 130)', glyph: 'SV', desc: 'Interactive farm & town map.', rev30: 1270, inst30: 14600, dau: 2200, rating: 4.5, crash: 0.62 },
-  { id: 'zelda', name: 'Zelda BotW Map', tag: 'MAP', cat: 'Game map', platforms: ['android','ios'], monet: 'Free + IAP', color: 'oklch(0.72 0.14 145)', glyph: 'Z', desc: 'Korok seeds, shrines, quests, treasure.', rev30: 4830, inst30: 26500, dau: 7200, rating: 4.7, crash: 0.28 },
-  { id: 'windrose', name: 'Windrose Companion', tag: 'GAME', cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.7 0.13 250)', glyph: 'Wr', desc: 'Field guide & build planner.', rev30: 540, inst30: 3200, dau: 610, rating: 4.3, crash: 0.71 },
-  { id: 'crimson', name: 'Crimson Desert Map', tag: 'MAP', cat: 'Game map', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.66 0.16 30)', glyph: 'CD', desc: 'World map, lore nodes, fast-travel.', rev30: 980, inst30: 7300, dau: 1510, rating: 4.4, crash: 0.49 },
-  { id: 'gzw', name: 'GZW Companion', tag: 'GAME', cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.62 0.13 30)', glyph: 'GZ', desc: 'Gray Zone Warfare ops & loot tracker.', rev30: 1640, inst30: 11200, dau: 2800, rating: 4.5, crash: 0.44 },
-  { id: 'wwm', name: 'Where Winds Meet', tag: 'MAP', cat: 'Game map', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.7 0.12 200)', glyph: 'WM', desc: 'Open-world atlas & quest tracker.', rev30: 1120, inst30: 9400, dau: 1960, rating: 4.4, crash: 0.36 },
+  { id: 'raiders', name: 'Raiders Companion',    tag: 'GAME',  cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.62 0.16 25)',  glyph: 'R',  desc: 'Strategy & loadout planner for Raiders.',                       rev30: 0, inst30: 0, dau: 0, rating: 4.5, crash: 0 },
+  { id: 'chordpro', name: 'Chord Finder Pro',    tag: 'MUSIC', cat: 'Music utility',  platforms: ['android'],       monet: 'Paid',       color: 'oklch(0.68 0.14 200)', glyph: 'C+', desc: 'Reverse chord lookup & voicings for guitarists.',               rev30: 0, inst30: 0, dau: 0, rating: 4.7, crash: 0 },
+  { id: 'chord2', name: 'Chord Finder 2',        tag: 'MUSIC', cat: 'Music utility',  platforms: ['android','ios'], monet: 'Free + IAP', color: 'oklch(0.7 0.13 220)',  glyph: 'C2', desc: 'Next-gen chord library with progressions & ear training.',      rev30: 0, inst30: 0, dau: 0, rating: 4.6, crash: 0 },
+  { id: 'tuner', name: 'Guitar Tuner',           tag: 'MUSIC', cat: 'Music utility',  platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.72 0.13 160)', glyph: 'GT', desc: 'Pitch-perfect tuner with alt tunings.',                         rev30: 0, inst30: 0, dau: 0, rating: 4.4, crash: 0 },
+  { id: 'strat', name: 'Stratagems',             tag: 'GAME',  cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.74 0.14 75)',  glyph: 'St', desc: 'Stratagem trainer & loadout reference.',                         rev30: 0, inst30: 0, dau: 0, rating: 4.6, crash: 0 },
+  { id: 'stardew', name: 'Stardew Valley Map',   tag: 'MAP',   cat: 'Game map',       platforms: ['android'],       monet: 'Free + ads', color: 'oklch(0.74 0.13 130)', glyph: 'SV', desc: 'Interactive farm & town map.',                                  rev30: 0, inst30: 0, dau: 0, rating: 4.5, crash: 0 },
+  { id: 'zelda', name: 'Zelda BotW Map',         tag: 'MAP',   cat: 'Game map',       platforms: ['android','ios'], monet: 'Free + IAP', color: 'oklch(0.72 0.14 145)', glyph: 'Z',  desc: 'Korok seeds, shrines, quests, treasure.',                       rev30: 0, inst30: 0, dau: 0, rating: 4.7, crash: 0 },
+  { id: 'windrose', name: 'Windrose Companion',  tag: 'GAME',  cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.7 0.13 250)',  glyph: 'Wr', desc: 'Field guide & build planner.',                                  rev30: 0, inst30: 0, dau: 0, rating: 4.3, crash: 0 },
+  { id: 'crimson', name: 'Crimson Desert Map',   tag: 'MAP',   cat: 'Game map',       platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.66 0.16 30)',  glyph: 'CD', desc: 'World map, lore nodes, fast-travel.',                          rev30: 0, inst30: 0, dau: 0, rating: 4.4, crash: 0 },
+  { id: 'gzw', name: 'GZW Companion',           tag: 'GAME',  cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.62 0.13 30)',  glyph: 'GZ', desc: 'Gray Zone Warfare ops & loot tracker.',                         rev30: 0, inst30: 0, dau: 0, rating: 4.5, crash: 0 },
+  { id: 'wwm', name: 'Where Winds Meet',         tag: 'MAP',   cat: 'Game map',       platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.7 0.12 200)',  glyph: 'WM', desc: 'Open-world atlas & quest tracker.',                             rev30: 0, inst30: 0, dau: 0, rating: 4.4, crash: 0 },
 ];
-
-function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function genSeries(days, baseDaily, growth=0.0, vol=0.18, seed=1){
-  const rng=mulberry32(seed); const out=[];
-  for(let i=0;i<days;i++){
-    const trend = baseDaily * (1 + growth*(i/days));
-    const wk = 1 + 0.08*Math.sin((i/7)*2*Math.PI - 0.6);
-    const noise = 1 + (rng()*2-1)*vol;
-    out.push(Math.max(0, trend*wk*noise));
-  }
-  return out;
-}
 
 const HORIZON = 90;
-APPS.forEach((a, i) => {
-  const dailyRev = a.rev30 / 30;
-  const dailyInst = a.inst30 / 30;
+const ZERO_SERIES = Array(HORIZON).fill(0);
+APPS.forEach(a => {
   a.series = {
-    revenue:  genSeries(HORIZON, dailyRev,  0.06, 0.22, 100+i),
-    admob:    genSeries(HORIZON, dailyRev*0.62, 0.05, 0.24, 200+i),
-    play:     genSeries(HORIZON, dailyRev*0.38, 0.04, 0.30, 300+i),
-    installs: genSeries(HORIZON, dailyInst, 0.03, 0.18, 400+i),
-    impr:     genSeries(HORIZON, dailyInst*1.8, 0.02, 0.16, 500+i),
-    ecpm:     genSeries(HORIZON, 6 + (i%5)*0.4, 0.01, 0.06, 600+i),
-    crashRate:genSeries(HORIZON, a.crash, -0.02, 0.20, 700+i),
-    anrRate:  genSeries(HORIZON, a.crash*0.4, 0.0, 0.22, 800+i),
-    refunds:  genSeries(HORIZON, dailyRev*0.02, 0.0, 0.5, 900+i),
+    revenue:   [...ZERO_SERIES],
+    admob:     [...ZERO_SERIES],
+    play:      [...ZERO_SERIES],
+    installs:  [...ZERO_SERIES],
+    impr:      [...ZERO_SERIES],
+    ecpm:      [...ZERO_SERIES],
+    crashRate: [...ZERO_SERIES],
+    anrRate:   [...ZERO_SERIES],
+    refunds:   [...ZERO_SERIES],
   };
 });
-const gzw = APPS.find(a=>a.id==='gzw');
-[7,8,9].forEach(d=>{ gzw.series.crashRate[HORIZON-d] *= 3.6; });
-const sv = APPS.find(a=>a.id==='stardew');
-[3,4,5].forEach(d=>{ sv.series.revenue[HORIZON-d] *= 0.42; sv.series.admob[HORIZON-d] *= 0.42; });
 
-const COUNTRIES = [
-  { c: 'United States', flag: '🇺🇸', rev: 6840, users: 38400, share: 0.32 },
-  { c: 'Germany',       flag: '🇩🇪', rev: 2310, users: 12100, share: 0.11 },
-  { c: 'United Kingdom',flag: '🇬🇧', rev: 1980, users: 11400, share: 0.09 },
-  { c: 'Sweden',        flag: '🇸🇪', rev: 1620, users:  6200, share: 0.075},
-  { c: 'France',        flag: '🇫🇷', rev: 1280, users:  9300, share: 0.06 },
-  { c: 'Canada',        flag: '🇨🇦', rev: 1140, users:  7800, share: 0.053},
-  { c: 'Australia',     flag: '🇦🇺', rev:  920, users:  5400, share: 0.043},
-  { c: 'Netherlands',   flag: '🇳🇱', rev:  710, users:  4100, share: 0.033},
-  { c: 'Japan',         flag: '🇯🇵', rev:  640, users:  6800, share: 0.030},
-  { c: 'Brazil',        flag: '🇧🇷', rev:  410, users: 12200, share: 0.019},
-];
-
-const AD_UNITS = [
-  { id:'au_1', app:'strat',   name:'Stratagems · Banner home',     fmt:'Banner',       imp: 412800, ecpm: 4.20, earn: 1734 },
-  { id:'au_2', app:'zelda',   name:'Zelda Map · Inter loaded',     fmt:'Interstitial', imp:  86200, ecpm:18.40, earn: 1586 },
-  { id:'au_3', app:'strat',   name:'Stratagems · Native list',     fmt:'Native',       imp: 211400, ecpm: 5.10, earn: 1078 },
-  { id:'au_4', app:'tuner',   name:'Tuner · Inter on session',     fmt:'Interstitial', imp:  72600, ecpm:12.80, earn:  929 },
-  { id:'au_5', app:'gzw',     name:'GZW · Rewarded loadout',       fmt:'Rewarded',     imp:  41800, ecpm:21.10, earn:  882 },
-  { id:'au_6', app:'stardew', name:'Stardew Map · Banner',         fmt:'Banner',       imp: 192300, ecpm: 3.80, earn:  730 },
-  { id:'au_7', app:'crimson', name:'Crimson · Inter map open',     fmt:'Interstitial', imp:  48100, ecpm:14.20, earn:  683 },
-  { id:'au_8', app:'wwm',     name:'WWM · Native quest cards',     fmt:'Native',       imp:  92400, ecpm: 6.20, earn:  573 },
-  { id:'au_9', app:'raiders', name:'Raiders · Banner home',        fmt:'Banner',       imp: 138200, ecpm: 3.40, earn:  470 },
-  { id:'au_10',app:'windrose',name:'Windrose · Inter session',     fmt:'Interstitial', imp:  21400, ecpm:16.00, earn:  342 },
-];
-
-const REVIEWS = [
-  { app:'zelda',   stars:5, who:'A. Lindberg',  when:'2h',  body:"Better than the official map. Korok tracking is chef's kiss.", sent:'pos' },
-  { app:'gzw',     stars:1, who:'Joonas K.',     when:'4h',  body:'Crashes every time I open the loot tracker after the new patch.', sent:'neg' },
-  { app:'strat',   stars:5, who:'Marco V.',      when:'6h',  body:'Saved my squad. Stratagem reaction times are noticeably faster.', sent:'pos' },
-  { app:'tuner',   stars:4, who:'Imani O.',      when:'9h',  body:'Accurate. Wish drop-D was a one-tap preset, but otherwise solid.', sent:'neu' },
-  { app:'chord2',  stars:5, who:'Hana T.',       when:'12h', body:'Progression generator is unreasonably good.', sent:'pos' },
-  { app:'stardew', stars:2, who:'P. Ohlsson',    when:'14h', body:"Map didn't load this morning. Empty state shown for 5 minutes.", sent:'neg' },
-  { app:'raiders', stars:4, who:'D. Mukherjee',  when:'1d',  body:'Loadout planner is great. Add export to image please.', sent:'neu' },
-  { app:'crimson', stars:5, who:'Solveig N.',    when:'1d',  body:'Lore nodes are a beautiful touch. Worth keeping installed.', sent:'pos' },
-];
-
-const ANOMALIES = [
-  { kind:'crash',  app:'gzw',     title:'Crash rate up 240% in last 72h',   detail:'Likely tied to v2.4.1 (rolled out Apr 22). Top stack: NullPointerException in LootTracker$Sync.', when:'3h ago', sev:'high' },
-  { kind:'rev',    app:'stardew', title:'Revenue dropped 58% over 3 days',  detail:'AdMob fill rate normal. Investigate impressions per session — check ad-cap config.', when:'1d ago', sev:'med' },
-  { kind:'rating', app:'tuner',   title:'Rating trend slipping toward 4.3', detail:'12 new 1-2★ reviews this week mention latency on Pixel 8a.', when:'2d ago', sev:'med' },
-  { kind:'good',   app:'strat',   title:'Installs +34% week-over-week',     detail:'Featured in r/Helldivers thread; organic traffic spike from US/DE/SE.', when:'1d ago', sev:'good' },
-];
+const COUNTRIES  = [];
+const AD_UNITS   = [];
+const REVIEWS    = [];
+const ANOMALIES  = [];
 
 const SYNC_SOURCES = [
-  { name:'Google Play Developer API', last:'4 min ago',  status:'ok',    desc:'12 apps · sales, installs, ratings, crashes, ANRs' },
-  { name:'AdMob Reporting v1',        last:'11 min ago', status:'ok',    desc:'Earnings, impressions, eCPM, match rate, ad units' },
-  { name:'Play Console Reports (GCS)',last:'34 min ago', status:'ok',    desc:'Bulk export · 30-day rolling · refunds & subs' },
-  { name:'App Store Connect',         last:'failed',     status:'error', desc:'Token expired Apr 27 · re-auth required' },
+  { name:'Google Play Developer Reporting', last:'—', status:'pending', desc:'Crash rates, ANR rates · signs in on first load' },
+  { name:'AdMob Reporting v1',              last:'—', status:'pending', desc:'Earnings, impressions, eCPM, match rate, ad units' },
+  { name:'Android Publisher API',           last:'—', status:'pending', desc:'Reviews per app' },
 ];
 
 window.XZ = { APPS, COUNTRIES, AD_UNITS, REVIEWS, ANOMALIES, SYNC_SOURCES, HORIZON };
@@ -1882,26 +1826,35 @@ async function loadRealData(token) {
   const cfg = window.CONFIG;
   const out = { admobEarnings: {}, reviews: null, crashRates: {}, syncStatus: {} };
 
+  console.log('[XZ] loadRealData start — packages:', cfg.packages);
+
   // ── AdMob: app list → earnings by app/day ────────────────────────────────
   if (!cfg.admobPublisherId.startsWith('REPLACE')) {
+    console.log('[XZ] AdMob: fetching app list for', cfg.admobPublisherId);
     try {
       const appsResp = await fetch(
         `https://admob.googleapis.com/v1/accounts/${cfg.admobPublisherId}/apps?pageSize=100`,
         { headers: h }
       );
-      const admobApps = appsResp.ok ? ((await appsResp.json()).apps || []) : [];
+      console.log('[XZ] AdMob apps response status:', appsResp.status);
+      const admobAppsBody = appsResp.ok ? await appsResp.json() : {};
+      if (!appsResp.ok) console.error('[XZ] AdMob apps error body:', admobAppsBody);
+      const admobApps = admobAppsBody.apps || [];
+      console.log('[XZ] AdMob: found', admobApps.length, 'apps:', admobApps.map(a => ({ appId: a.appId, pkg: a.linkedAppInfo?.androidAppId })));
+
       const pkgToId = {};
       Object.entries(cfg.packages).forEach(([id, pkg]) => { pkgToId[pkg] = id; });
-      // Network report APP dimension value = AdMob appId (ca-app-pub-X~Y), not resource name
       const admobIdToXz = {};
       admobApps.forEach(a => {
         const pkg = a.linkedAppInfo?.androidAppId;
         if (pkg && pkgToId[pkg] && a.appId) admobIdToXz[a.appId] = pkgToId[pkg];
       });
+      console.log('[XZ] AdMob: ID→XZ mapping:', admobIdToXz);
 
       const end = new Date();
       const start = new Date(Date.now() - 89 * 864e5);
       const fmt = d => ({ year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() });
+      console.log('[XZ] AdMob: fetching network report', fmt(start), '→', fmt(end));
       const rptResp = await fetch(
         `https://admob.googleapis.com/v1/accounts/${cfg.admobPublisherId}/networkReport:generate`,
         { method: 'POST', headers: h, body: JSON.stringify({
@@ -1914,18 +1867,18 @@ async function loadRealData(token) {
           })
         }
       );
+      console.log('[XZ] AdMob report response status:', rptResp.status);
       if (rptResp.ok) {
         const text = await rptResp.text();
-        // Response may be a JSON array or newline-delimited JSON objects
         let items = [];
         try { const p = JSON.parse(text); items = Array.isArray(p) ? p : [p]; }
         catch { items = text.trim().split('\n').map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean); }
-        items.forEach(obj => {
-          if (!obj?.row) return;
-          const { row } = obj;
+        const dataRows = items.filter(o => o?.row);
+        console.log('[XZ] AdMob: parsed', items.length, 'items,', dataRows.length, 'data rows');
+        dataRows.forEach(({ row }) => {
           const dims = row.dimensionValues || {};
-          const admobAppId = dims.APP?.value; // ca-app-pub-X~Y
-          const dateVal = dims.DATE?.value;   // YYYYMMDD
+          const admobAppId = dims.APP?.value;
+          const dateVal = dims.DATE?.value;
           const ourId = admobIdToXz[admobAppId];
           if (!ourId || !dateVal) return;
           if (!out.admobEarnings[ourId]) out.admobEarnings[ourId] = {};
@@ -1936,25 +1889,40 @@ async function loadRealData(token) {
             ecpm: parseFloat(mv.ECPM?.doubleValue ?? 0),
           };
         });
+        const summary = Object.entries(out.admobEarnings).map(([id, days]) => ({
+          id, days: Object.keys(days).length,
+          total30: Object.entries(days).slice(-30).reduce((s,[,v]) => s + v.earn, 0).toFixed(2),
+        }));
+        console.log('[XZ] AdMob: earnings by app (last 30d):', summary);
         out.syncStatus.admob = { ok: true };
+      } else {
+        const errBody = await rptResp.text();
+        console.error('[XZ] AdMob report error:', errBody);
+        out.syncStatus.admob = { ok: false };
       }
     } catch(e) {
-      console.warn('AdMob API error:', e.message);
+      console.error('[XZ] AdMob API exception:', e);
       out.syncStatus.admob = { ok: false };
     }
+  } else {
+    console.log('[XZ] AdMob: skipped — publisherId not configured');
   }
 
   // ── Reviews (Android Publisher) ──────────────────────────────────────────
   const allReviews = [];
   for (const [id, pkg] of Object.entries(cfg.packages)) {
     if (pkg.startsWith('REPLACE')) continue;
+    console.log(`[XZ] Reviews: fetching for ${id} (${pkg})`);
     try {
       const r = await fetch(
         `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${pkg}/reviews?maxResults=10&translationLanguage=en`,
         { headers: h }
       );
+      console.log(`[XZ] Reviews: ${pkg} → status ${r.status}`);
       if (r.ok) {
         const data = await r.json();
+        const count = data.reviews?.length || 0;
+        console.log(`[XZ] Reviews: ${pkg} → ${count} reviews`);
         (data.reviews || []).forEach(rv => {
           const c = rv.comments?.[0]?.userComment;
           if (!c?.text) return;
@@ -1970,10 +1938,14 @@ async function loadRealData(token) {
           });
         });
         out.syncStatus.reviews = { ok: true };
+      } else {
+        const errBody = await r.text();
+        console.warn(`[XZ] Reviews: ${pkg} error body:`, errBody);
       }
-    } catch(e) { console.warn(`Reviews ${pkg}:`, e.message); }
+    } catch(e) { console.error(`[XZ] Reviews exception for ${pkg}:`, e); }
   }
   if (allReviews.length) out.reviews = allReviews.slice(0, 24);
+  console.log('[XZ] Reviews: total collected:', allReviews.length);
 
   // ── Crash rates (Play Developer Reporting) ───────────────────────────────
   const end = new Date();
@@ -1981,6 +1953,7 @@ async function loadRealData(token) {
   const fmtDT = d => ({ year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate(), timeZone: { id: 'UTC' } });
   for (const [id, pkg] of Object.entries(cfg.packages)) {
     if (pkg.startsWith('REPLACE')) continue;
+    console.log(`[XZ] Crash rates: fetching for ${id} (${pkg})`);
     try {
       const r = await fetch(
         `https://playdeveloperreporting.googleapis.com/v1beta1/apps/${encodeURIComponent(pkg)}/crashRateMetricSet:query`,
@@ -1992,18 +1965,30 @@ async function loadRealData(token) {
           })
         }
       );
+      console.log(`[XZ] Crash rates: ${pkg} → status ${r.status}`);
       if (r.ok) {
         const data = await r.json();
-        if (data.rows?.length) {
+        const rowCount = data.rows?.length || 0;
+        console.log(`[XZ] Crash rates: ${pkg} → ${rowCount} rows`);
+        if (rowCount) {
           out.crashRates[id] = data.rows.map(row => {
             const m = (row.metrics || []).find(x => x.metric === 'crashRate');
             return parseFloat(m?.decimalValue ?? '0') * 100;
           });
         }
+      } else {
+        const errBody = await r.text();
+        console.warn(`[XZ] Crash rates: ${pkg} error:`, errBody);
       }
-    } catch(e) { console.warn(`Crash rates ${pkg}:`, e.message); }
+    } catch(e) { console.error(`[XZ] Crash rates exception for ${pkg}:`, e); }
   }
 
+  console.log('[XZ] loadRealData done:', {
+    admobApps: Object.keys(out.admobEarnings).length,
+    reviews: out.reviews?.length ?? 0,
+    crashApps: Object.keys(out.crashRates).length,
+    syncStatus: out.syncStatus,
+  });
   return out;
 }
 
@@ -2012,7 +1997,16 @@ function applyRealData(updates) {
   const HORIZON = XZ.HORIZON;
   const today = new Date();
 
-  if (updates.reviews?.length) XZ.REVIEWS = updates.reviews;
+  console.log('[XZ] applyRealData:', {
+    admobApps: Object.keys(updates.admobEarnings).length,
+    reviews: updates.reviews?.length ?? 0,
+    crashApps: Object.keys(updates.crashRates).length,
+  });
+
+  if (updates.reviews?.length) {
+    XZ.REVIEWS = updates.reviews;
+    console.log('[XZ] Applied', updates.reviews.length, 'reviews');
+  }
 
   Object.entries(updates.admobEarnings).forEach(([id, byDate]) => {
     const app = XZ.APPS.find(a => a.id === id);
@@ -2030,6 +2024,7 @@ function applyRealData(updates) {
     app.series.impr  = newImpr;
     app.series.ecpm  = newEcpm;
     app.rev30 = newAdmob.slice(-30).reduce((s, v) => s + v, 0);
+    console.log(`[XZ] Applied AdMob for ${id}: rev30=$${app.rev30.toFixed(2)}`);
   });
 
   Object.entries(updates.crashRates).forEach(([id, series]) => {
@@ -2039,16 +2034,20 @@ function applyRealData(updates) {
     series.forEach((v, i) => { const idx = HORIZON - series.length + i; if (idx >= 0) padded[idx] = v; });
     app.series.crashRate = padded;
     app.crash = series[series.length - 1] ?? app.crash;
+    console.log(`[XZ] Applied crash rate for ${id}: latest=${app.crash.toFixed(3)}%`);
   });
 
   const nowStr = new Date().toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
   XZ.SYNC_SOURCES = XZ.SYNC_SOURCES.map(s => {
     if (s.name.includes('AdMob'))
       return { ...s, last: updates.syncStatus.admob?.ok ? nowStr : 'failed', status: updates.syncStatus.admob?.ok ? 'ok' : 'error' };
-    if (s.name.includes('Google Play Developer'))
-      return { ...s, last: updates.syncStatus.reviews?.ok ? nowStr : s.last, status: updates.syncStatus.reviews?.ok ? 'ok' : s.status };
+    if (s.name.includes('Reporting'))
+      return { ...s, last: Object.keys(updates.crashRates).length ? nowStr : s.last, status: Object.keys(updates.crashRates).length ? 'ok' : 'error' };
+    if (s.name.includes('Android Publisher'))
+      return { ...s, last: updates.syncStatus.reviews?.ok ? nowStr : 'failed', status: updates.syncStatus.reviews?.ok ? 'ok' : 'error' };
     return s;
   });
+  console.log('[XZ] applyRealData done — sync sources updated');
 }
 
 // ── App ───────────────────────────────────────────────────────────────────────
