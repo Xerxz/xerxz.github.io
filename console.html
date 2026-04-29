@@ -1852,7 +1852,7 @@ async function loadRealData(token) {
       Object.entries(cfg.packages).forEach(([id, pkg]) => { pkgToId[pkg] = id; });
       const admobIdToXz = {};
       admobApps.forEach(a => {
-        const pkg = a.linkedAppInfo?.androidAppId;
+        const pkg = a.linkedAppInfo?.androidAppId || a.linkedAppInfo?.appStoreId;
         if (pkg && pkgToId[pkg] && a.appId) admobIdToXz[a.appId] = pkgToId[pkg];
       });
       console.log('[XZ] AdMob: ID→XZ mapping:', admobIdToXz);
