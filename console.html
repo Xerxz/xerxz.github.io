@@ -877,10 +877,10 @@ const palette = [C.blue, C.green, C.amber, C.violet, C.red,
   'oklch(0.78 0.12 60)','oklch(0.66 0.13 250)','oklch(0.7 0.13 100)','oklch(0.72 0.13 350)'];
 
 function fmtMoney(n){
-  if(n==null||isNaN(n)) return '$0';
-  if(Math.abs(n)>=1e6) return '$'+(n/1e6).toFixed(2)+'M';
-  if(Math.abs(n)>=1e3) return '$'+(n/1e3).toFixed(1)+'k';
-  return '$'+n.toFixed(0);
+  if(n==null||isNaN(n)) return '0 kr';
+  if(Math.abs(n)>=1e6) return (n/1e6).toFixed(2)+'M kr';
+  if(Math.abs(n)>=1e3) return (n/1e3).toFixed(1)+'k kr';
+  return n.toFixed(0)+' kr';
 }
 function fmtNum(n){
   if(n==null||isNaN(n)) return '0';
@@ -1400,7 +1400,7 @@ function Overview({ apps, days, totalRev, totalRevP, admob, admobP, play, instal
     { label:'Active devices (DAU)',    value: fmtNum(dau),           delta: 0.041,                                    spark: aggregateApps(apps,'installs',days).map(v=>v*0.18+dau*0.7), color:ChartC.blue, sub:'rolling 24h' },
     { label:'Rating average',          value: ratingAvg.toFixed(2),  delta: 0.012,                                    spark: aggregateApps(apps,'installs',days).map((_,i)=>4.4+0.1*Math.sin(i/3)), color:ChartC.amber, sub:'weighted by installs' },
     { label:'Crash rate',              value: crash.toFixed(2)+'%',  delta: -0.073, inverse:true,                      spark: aggregateApps(apps,'crashRate',days).map(v=>v/Math.max(1,apps.length)), color:ChartC.red, sub:'sessions · 24h' },
-    { label:'Ad impressions',          value: fmtNum(impr),          delta: 0.062,                                    spark: aggregateApps(apps,'impr',days), color:ChartC.green, sub:`eCPM $${ecpm.toFixed(2)}` },
+    { label:'Ad impressions',          value: fmtNum(impr),          delta: 0.062,                                    spark: aggregateApps(apps,'impr',days), color:ChartC.green, sub:`eCPM ${ecpm.toFixed(0)} kr` },
   ];
 
   const rankedRev = window.XZ.APPS.map(a=>({ label:a.name, value:sumRange(a.series.revenue, days), color:a.color, app:a })).sort((a,b)=>b.value-a.value).slice(0,8);
@@ -1602,7 +1602,7 @@ function AdsView({ apps, days }){
                   <td><div className="dx-cell-app"><AppIcon app={app} size={22} radius={5}/><span>{app.name}</span></div></td>
                   <td><Tag>{u.fmt}</Tag></td>
                   <td className="r mono">{fmtNum(u.imp)}</td>
-                  <td className="r mono">${u.ecpm.toFixed(2)}</td>
+                  <td className="r mono">{u.ecpm.toFixed(0)} kr</td>
                   <td className="r mono">{fmtMoney(u.earn)}</td>
                 </tr>
               );
@@ -1840,7 +1840,13 @@ async function loadRealData(token) {
       const admobAppsBody = appsResp.ok ? await appsResp.json() : {};
       if (!appsResp.ok) console.error('[XZ] AdMob apps error body:', admobAppsBody);
       const admobApps = admobAppsBody.apps || [];
-      console.log('[XZ] AdMob: found', admobApps.length, 'apps:', admobApps.map(a => ({ appId: a.appId, pkg: a.linkedAppInfo?.androidAppId })));
+      const admobAppsSummary = admobApps.map(a => ({
+        appId: a.appId,
+        name: a.manualAppInfo?.displayName,
+        androidPkg: a.linkedAppInfo?.androidAppId,
+        iosBundleId: a.linkedAppInfo?.appStoreId,
+      }));
+      console.log('[XZ] AdMob: found', admobApps.length, 'apps:', admobAppsSummary);
 
       const pkgToId = {};
       Object.entries(cfg.packages).forEach(([id, pkg]) => { pkgToId[pkg] = id; });
@@ -1850,6 +1856,8 @@ async function loadRealData(token) {
         if (pkg && pkgToId[pkg] && a.appId) admobIdToXz[a.appId] = pkgToId[pkg];
       });
       console.log('[XZ] AdMob: ID→XZ mapping:', admobIdToXz);
+      if (!Object.keys(admobIdToXz).length)
+        console.warn('[XZ] AdMob: mapping empty — compare androidPkg values above with CONFIG.packages');
 
       const end = new Date();
       const start = new Date(Date.now() - 89 * 864e5);
@@ -1861,8 +1869,9 @@ async function loadRealData(token) {
             reportSpec: {
               dateRange: { startDate: fmt(start), endDate: fmt(end) },
               dimensions: ['APP', 'DATE'],
-              metrics: ['ESTIMATED_EARNINGS', 'IMPRESSIONS', 'ECPM'],
+              metrics: ['ESTIMATED_EARNINGS', 'IMPRESSIONS', 'IMPRESSION_RPM'],
               sortConditions: [{ dimension: 'DATE', order: 'ASCENDING' }],
+              localizationSettings: { currencyCode: 'SEK' },
             }
           })
         }
@@ -1886,7 +1895,7 @@ async function loadRealData(token) {
           out.admobEarnings[ourId][dateVal] = {
             earn: (parseInt(mv.ESTIMATED_EARNINGS?.microsValue ?? 0)) / 1e6,
             impr: parseInt(mv.IMPRESSIONS?.integerValue ?? 0),
-            ecpm: parseFloat(mv.ECPM?.doubleValue ?? 0),
+            ecpm: (parseInt(mv.IMPRESSION_RPM?.microsValue ?? 0)) / 1e6,
           };
         });
         const summary = Object.entries(out.admobEarnings).map(([id, days]) => ({
@@ -1958,7 +1967,7 @@ async function loadRealData(token) {
       const r = await fetch(
         `https://playdeveloperreporting.googleapis.com/v1beta1/apps/${encodeURIComponent(pkg)}/crashRateMetricSet:query`,
         { method: 'POST', headers: h, body: JSON.stringify({
-            timeline: { aggregationPeriod: 'DAILY', startTime: fmtDT(startCrash), endTime: fmtDT(end) },
+            timelineSpec: { aggregationPeriod: 'DAILY', startTime: fmtDT(startCrash), endTime: fmtDT(end) },
             dimensions: [],
             metrics: ['crashRate'],
             pageSize: 90,
@@ -2024,7 +2033,7 @@ function applyRealData(updates) {
     app.series.impr  = newImpr;
     app.series.ecpm  = newEcpm;
     app.rev30 = newAdmob.slice(-30).reduce((s, v) => s + v, 0);
-    console.log(`[XZ] Applied AdMob for ${id}: rev30=$${app.rev30.toFixed(2)}`);
+    console.log(`[XZ] Applied AdMob for ${id}: rev30=${app.rev30.toFixed(0)} kr`);
   });
 
   Object.entries(updates.crashRates).forEach(([id, series]) => {
