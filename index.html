@@ -3,21 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xerxz Apps</title>
+  <title>Xerxz — Independent app studio</title>
+  <meta name="description" content="A small independent studio in Sweden building companion tools, music utilities, and game atlases for mobile.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #080b14;
-      --surface: #0d1120;
-      --surface2: #131929;
-      --border: rgba(255,255,255,0.07);
-      --text: #e8eaf0;
-      --muted: #6b7280;
-      --accent: #4f8ef7;
-      --accent2: #a78bfa;
-      --accent3: #34d399;
-      --glow: rgba(79,142,247,0.18);
+      --bg: #08090d;
+      --surface: #0c0e14;
+      --surface-2: #11141d;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-2: rgba(255, 255, 255, 0.04);
+      --text: #e6e8ef;
+      --text-dim: rgba(230, 232, 239, 0.62);
+      --text-mute: rgba(230, 232, 239, 0.4);
+      --accent: oklch(0.72 0.14 240);
+      --accent-soft: oklch(0.72 0.14 240 / 0.14);
+      --accent-line: oklch(0.72 0.14 240 / 0.28);
+      --good: oklch(0.74 0.14 150);
+      --warn: oklch(0.78 0.14 75);
+      --bad: oklch(0.7 0.16 25);
+      --r-sm: 6px;
+      --r-md: 10px;
+      --r-lg: 14px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,471 +36,610 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 400;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
-      line-height: 1.6;
+      letter-spacing: -0.005em;
     }
 
-    /* ── NOISE OVERLAY ── */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
-      opacity: 0.4;
+      background:
+        radial-gradient(1200px 600px at 12% -10%, oklch(0.72 0.14 240 / 0.08), transparent 60%),
+        radial-gradient(900px 500px at 95% 10%, oklch(0.72 0.14 290 / 0.05), transparent 60%);
     }
 
-    /* ── HERO GRADIENT BLOB ── */
-    .blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.15;
-      pointer-events: none;
-    }
-    .blob-1 { width: 700px; height: 700px; background: #4f8ef7; top: -200px; left: -200px; }
-    .blob-2 { width: 500px; height: 500px; background: #a78bfa; top: 100px; right: -100px; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
 
-    /* ── NAV ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
+    .ps-root { position: relative; z-index: 1; }
+
+    /* ── Nav ─────────────────────────────────────── */
+    .ps-nav {
+      position: sticky;
+      top: 0;
       z-index: 100;
-      padding: 18px 48px;
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      background: rgba(8, 9, 13, 0.7);
+      border-bottom: 1px solid var(--border);
+    }
+    .ps-nav-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 14px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      backdrop-filter: blur(20px);
-      background: rgba(8,11,20,0.7);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      font-size: 1.4rem;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #4f8ef7, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .nav-links {
-      display: flex;
-      gap: 32px;
-      list-style: none;
-    }
-    .nav-links a {
-      text-decoration: none;
-      color: var(--muted);
-      font-size: 0.9rem;
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-
-    /* ── HERO ── */
-    .hero {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 120px 24px 80px;
-      overflow: hidden;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(79,142,247,0.1);
-      border: 1px solid rgba(79,142,247,0.25);
-      border-radius: 100px;
-      padding: 6px 16px;
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--accent);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-bottom: 28px;
-      animation: fadeUp 0.8s ease both;
-    }
-    .hero-badge::before {
-      content: '';
-      width: 6px; height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--accent);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    .hero h1 {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      font-size: clamp(2.8rem, 6.5vw, 5.5rem);
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-      animation: fadeUp 0.8s 0.1s ease both;
-    }
-    .hero h1 span {
-      background: linear-gradient(135deg, #4f8ef7 0%, #a78bfa 50%, #34d399 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero-sub {
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      color: var(--muted);
-      max-width: 520px;
-      margin: 24px auto 0;
-      font-weight: 300;
-      animation: fadeUp 0.8s 0.2s ease both;
-    }
-    .hero-cta {
-      margin-top: 48px;
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      animation: fadeUp 0.8s 0.3s ease both;
-    }
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--accent);
-      color: #fff;
-      padding: 14px 28px;
-      border-radius: 12px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 30px rgba(79,142,247,0.3);
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(79,142,247,0.4); }
-    .btn-ghost {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: transparent;
-      color: var(--text);
-      padding: 14px 28px;
-      border-radius: 12px;
-      font-weight: 400;
-      font-size: 0.95rem;
-      text-decoration: none;
-      border: 1px solid var(--border);
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
-
-    .hero-scroll {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      animation: fadeUp 1s 0.6s ease both;
-    }
-    .scroll-line {
-      width: 1px;
-      height: 40px;
-      background: linear-gradient(to bottom, var(--muted), transparent);
-      animation: scrollAnim 2s ease infinite;
-    }
-    @keyframes scrollAnim {
-      0% { opacity: 0; transform: scaleY(0); transform-origin: top; }
-      50% { opacity: 1; transform: scaleY(1); }
-      100% { opacity: 0; transform: scaleY(0); transform-origin: bottom; }
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── STATS BAR ── */
-    .stats {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      justify-content: center;
-      gap: 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      overflow: hidden;
-    }
-    .stat {
-      flex: 1;
-      max-width: 220px;
-      padding: 32px 24px;
-      text-align: center;
-      border-right: 1px solid var(--border);
-    }
-    .stat:last-child { border-right: none; }
-    .stat-num {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      font-size: 2.2rem;
-      background: linear-gradient(135deg, #4f8ef7, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .stat-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.05em; margin-top: 4px; text-transform: uppercase; }
-
-    /* ── SECTION ── */
-    section { position: relative; z-index: 1; }
-    .section-inner { max-width: 1200px; margin: 0 auto; padding: 100px 48px; }
-
-    .section-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 16px;
-    }
-    .section-tag::before {
-      content: '';
-      width: 20px;
-      height: 1px;
-      background: var(--accent);
-    }
-    .section-title {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      font-size: clamp(2rem, 4vw, 3rem);
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
-    }
-    .section-title span {
-      background: linear-gradient(135deg, #4f8ef7, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .section-sub { color: var(--muted); max-width: 480px; margin-bottom: 64px; }
-
-    /* ── APP CARDS ── */
-    .apps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: 24px;
     }
-
-    .app-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-      display: flex;
-      flex-direction: column;
-    }
-    .app-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(79,142,247,0.3);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(79,142,247,0.1);
-    }
-
-    .app-card-img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      display: block;
-      background: var(--surface2);
-    }
-
-    /* Placeholder screenshot art */
-    .app-card-art {
-      height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .app-card-art .art-icon {
-      font-size: 4rem;
-      z-index: 1;
-      position: relative;
-      filter: drop-shadow(0 0 20px currentColor);
-    }
-    .app-card-art::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      opacity: 0.15;
-    }
-
-    /* per-app color themes */
-    .theme-blue   { background: linear-gradient(135deg, #0a1628, #0d2040); }
-    .theme-blue   .art-icon { color: #4f8ef7; }
-    .theme-blue::before   { background: radial-gradient(circle at 50% 50%, #4f8ef7, transparent 60%); }
-
-    .theme-purple { background: linear-gradient(135deg, #12082a, #1c0f3d); }
-    .theme-purple .art-icon { color: #a78bfa; }
-    .theme-purple::before { background: radial-gradient(circle at 50% 50%, #a78bfa, transparent 60%); }
-
-    .theme-green  { background: linear-gradient(135deg, #06160f, #0b231a); }
-    .theme-green  .art-icon { color: #34d399; }
-    .theme-green::before  { background: radial-gradient(circle at 50% 50%, #34d399, transparent 60%); }
-
-    .theme-orange { background: linear-gradient(135deg, #1a0d00, #2a1500); }
-    .theme-orange .art-icon { color: #fb923c; }
-    .theme-orange::before { background: radial-gradient(circle at 50% 50%, #fb923c, transparent 60%); }
-
-    .theme-cyan   { background: linear-gradient(135deg, #021218, #041e2a); }
-    .theme-cyan   .art-icon { color: #22d3ee; }
-    .theme-cyan::before   { background: radial-gradient(circle at 50% 50%, #22d3ee, transparent 60%); }
-
-    .theme-rose   { background: linear-gradient(135deg, #180810, #28101c); }
-    .theme-rose   .art-icon { color: #fb7185; }
-    .theme-rose::before   { background: radial-gradient(circle at 50% 50%, #fb7185, transparent 60%); }
-
-    .app-card-body {
-      padding: 24px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .app-card-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-    .app-card-name {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700;
-      font-size: 1.15rem;
-      letter-spacing: -0.01em;
-    }
-    .app-badge {
-      font-size: 0.68rem;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 100px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .badge-free { background: rgba(52,211,153,0.12); color: #34d399; border: 1px solid rgba(52,211,153,0.25); }
-    .badge-paid { background: rgba(251,146,60,0.12); color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
-    .badge-ads  { background: rgba(79,142,247,0.12); color: #4f8ef7; border: 1px solid rgba(79,142,247,0.25); }
-
-    .app-card-desc {
-      color: var(--muted);
-      font-size: 0.875rem;
-      line-height: 1.6;
-      margin-bottom: 20px;
-      flex: 1;
-    }
-
-    .app-card-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 20px;
-    }
-    .tag {
-      font-size: 0.72rem;
-      padding: 4px 10px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      color: var(--muted);
-    }
-
-    .app-card-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .btn-store {
+    .ps-logo {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-size: 0.82rem;
+      gap: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+    .ps-mark {
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, oklch(0.72 0.14 240), oklch(0.6 0.14 260));
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0;
+      box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18), 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+    .ps-mark.sm { width: 18px; height: 18px; font-size: 10px; border-radius: 5px; }
+    .ps-logo-tag {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10.5px;
       font-weight: 500;
-      text-decoration: none;
-      transition: transform 0.2s, opacity 0.2s;
-      cursor: pointer;
-      border: none;
-    }
-    .btn-store:hover { transform: translateY(-1px); opacity: 0.9; }
-    .btn-google {
-      background: linear-gradient(135deg, #1a73e8, #1557b0);
-      color: #fff;
-    }
-    .btn-apple {
-      background: linear-gradient(135deg, #2c2c2e, #1c1c1e);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .btn-policy {
-      background: transparent;
-      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      padding: 2px 6px;
       border: 1px solid var(--border);
-      font-size: 0.78rem;
+      border-radius: 4px;
+      margin-left: 4px;
     }
-    .btn-policy:hover { color: var(--text); }
+    .ps-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .ps-links a {
+      color: var(--text-dim);
+      font-size: 13.5px;
+      font-weight: 400;
+      transition: color 0.15s;
+    }
+    .ps-links a:hover { color: var(--text); }
+    .ps-nav-cta { display: flex; gap: 8px; align-items: center; }
 
-    /* ── DIVIDER ── */
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 0 48px;
+    .ps-btn, .ps-btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .ps-btn {
+      background: var(--text);
+      color: #0b0c10;
+    }
+    .ps-btn:hover { background: #fff; }
+    .ps-btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .ps-btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.14);
     }
 
-    /* ── FOOTER ── */
-    footer {
+    /* ── Layout ─────────────────────────────────── */
+    .ps-main { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+    .ps-section { padding: 80px 0; border-top: 1px solid var(--border-2); }
+    .ps-section:first-of-type { border-top: none; }
+    .ps-section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 32px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .ps-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .ps-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--good);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--good);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+
+    .ps-h1 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      color: var(--text);
+    }
+    .ps-h1 em {
+      font-style: italic;
+      font-weight: 500;
+      background: linear-gradient(135deg, oklch(0.78 0.14 240), oklch(0.74 0.13 200));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .ps-h2 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      max-width: 36ch;
+    }
+
+    /* ── Hero ───────────────────────────────────── */
+    .ps-hero {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 72px;
+      padding: 88px 0 80px;
+      align-items: center;
+    }
+    .ps-lead {
+      color: var(--text-dim);
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 24px 0 0;
+      max-width: 56ch;
+    }
+    .ps-hero-cta {
+      display: flex;
+      gap: 10px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .ps-hero-cta .ps-btn,
+    .ps-hero-cta .ps-btn-ghost { padding: 11px 18px; font-size: 13.5px; }
+
+    .ps-stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border-2);
+    }
+    .ps-stat-row > div {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ps-stat-row b {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    .ps-stat-row span {
+      font-size: 12px;
+      color: var(--text-mute);
+      letter-spacing: 0.02em;
+    }
+
+    .ps-mosaic {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      align-content: center;
+      transform: rotate(-2deg);
+    }
+    .ps-mosaic-cell {
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+      animation: cellIn 0.6s ease-out both;
+    }
+    .ps-mosaic-cell:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent-line);
+    }
+    @keyframes cellIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .app-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
       position: relative;
-      z-index: 1;
-      border-top: 1px solid var(--border);
-      padding: 48px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.85rem;
+      overflow: hidden;
+      flex: 0 0 auto;
+      box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.16), 0 1px 2px rgba(0, 0, 0, 0.4);
     }
-    footer a { color: var(--accent); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
+    .app-icon-glyph {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: rgba(255, 255, 255, 0.95);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+    }
+    .app-icon-blob {
+      position: absolute;
+      inset: 0;
+      opacity: 0.55;
+    }
 
-    /* ── MODAL ── */
+    /* ── Apps catalog ───────────────────────────── */
+    .ps-tabs {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      padding: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .ps-tab {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .ps-tab:hover { color: var(--text); }
+    .ps-tab.on {
+      background: var(--surface-2);
+      color: var(--text);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .ps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 14px;
+    }
+
+    .ps-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      transition: border-color 0.2s, background 0.2s;
+      overflow: hidden;
+    }
+    .ps-card:hover { border-color: rgba(255, 255, 255, 0.12); }
+    .ps-card.open { background: var(--surface-2); }
+
+    .ps-card-head {
+      width: 100%;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      text-align: left;
+    }
+    .ps-card-title { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .ps-card-name {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 14.5px;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .ps-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 11.5px;
+      color: var(--text-dim);
+    }
+    .ps-card-monet { font-size: 11.5px; color: var(--text-mute); }
+    .ps-chev {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      color: var(--text-mute);
+      transition: transform 0.2s;
+    }
+    .ps-card.open .ps-chev { transform: rotate(90deg); }
+
+    .ps-card-body {
+      padding: 0 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: bodyIn 0.25s ease;
+    }
+    @keyframes bodyIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .ps-card-desc {
+      color: var(--text-dim);
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+    .ps-shots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .ps-shot {
+      aspect-ratio: 9 / 14;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .ps-shot-overlay {
+      position: absolute;
+      inset: 14% 12% auto 12%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .ps-shot-bar {
+      height: 5px;
+      width: 80%;
+      background: rgba(255, 255, 255, 0.34);
+      border-radius: 2px;
+    }
+    .ps-shot-bar.w50 { width: 50%; }
+    .ps-shot-bar.w70 { width: 70%; }
+    .ps-shot-img {
+      margin-top: 8px;
+      height: 32%;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 6px;
+    }
+    .ps-shot-tag {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      font-size: 9.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    .ps-card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .ps-mini-label {
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      margin-bottom: 8px;
+    }
+    .ps-bullets, .ps-links-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .ps-bullets li {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      padding-left: 14px;
+      position: relative;
+    }
+    .ps-bullets li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px;
+      width: 4px; height: 4px;
+      background: var(--text-mute);
+      border-radius: 50%;
+    }
+    .ps-links-list li a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--text-dim);
+      transition: color 0.15s;
+    }
+    .ps-links-list li a:hover { color: var(--text); }
+
+    .ps-card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+    }
+    .ps-store {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .ps-store:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .ps-store.ghost {
+      background: transparent;
+      color: var(--text-dim);
+    }
+
+    .ps-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      font-size: 10.5px;
+      line-height: 1.4;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+    }
+    .ps-platforms {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--text-mute);
+    }
+
+    /* ── Support ────────────────────────────────── */
+    .ps-support .ps-h2 { margin-bottom: 32px; }
+    .ps-support-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .ps-support-card {
+      display: flex;
+      gap: 14px;
+      padding: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+    }
+    .ps-support-card svg { flex-shrink: 0; margin-top: 2px; }
+    .ps-support-t {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .ps-support-d {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--text-dim);
+    }
+
+    /* ── Footer ─────────────────────────────────── */
+    .ps-foot {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 64px 32px 32px;
+      border-top: 1px solid var(--border);
+    }
+    .ps-foot-inner {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    .ps-foot-blurb {
+      color: var(--text-dim);
+      font-size: 12.5px;
+      line-height: 1.55;
+      margin-top: 12px;
+      max-width: 32ch;
+    }
+    .ps-foot-h {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      margin-bottom: 12px;
+    }
+    .ps-foot ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .ps-foot ul a {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      transition: color 0.15s;
+    }
+    .ps-foot ul a:hover { color: var(--text); }
+
+    .ps-foot-base {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-2);
+      font-size: 11.5px;
+      color: var(--text-mute);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Modal (privacy policies) ───────────────── */
     .modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
       z-index: 200;
       align-items: center;
       justify-content: center;
@@ -501,525 +649,442 @@
     .modal {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 40px;
-      max-width: 680px;
+      border-radius: 14px;
+      padding: 32px;
+      max-width: 640px;
       width: 100%;
       max-height: 80vh;
       overflow-y: auto;
       position: relative;
-      animation: modalIn 0.25s ease;
+      animation: modalIn 0.2s ease;
     }
     @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      from { opacity: 0; transform: scale(0.97) translateY(6px); }
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
     .modal-close {
       position: absolute;
-      top: 16px; right: 16px;
-      background: rgba(255,255,255,0.07);
+      top: 14px; right: 14px;
+      background: rgba(255, 255, 255, 0.06);
       border: none;
-      color: var(--muted);
-      width: 32px; height: 32px;
-      border-radius: 50%;
+      color: var(--text-dim);
+      width: 28px; height: 28px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
+      font-size: 14px;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s;
     }
-    .modal-close:hover { background: rgba(255,255,255,0.15); color: var(--text); }
-    .modal h2 { font-family: 'Outfit', sans-serif; font-size: 1.5rem; margin-bottom: 20px; }
-    .modal-content { color: var(--muted); font-size: 0.875rem; line-height: 1.8; }
-    .modal-content h2, .modal-content h3, .modal-content h4 {
+    .modal-close:hover { background: rgba(255, 255, 255, 0.12); color: var(--text); }
+    .modal-content { color: var(--text-dim); font-size: 13.5px; line-height: 1.7; }
+    .modal-content h2, .modal-content h3 {
       font-family: 'Outfit', sans-serif;
       color: var(--text);
-      margin: 20px 0 8px;
+      font-weight: 600;
+      margin: 0 0 12px;
     }
-    .modal-content ul { padding-left: 20px; }
+    .modal-content h2 { font-size: 18px; }
+    .modal-content p { margin-bottom: 12px; }
     .modal-content a { color: var(--accent); }
     .modal-content strong { color: var(--text); font-weight: 500; }
 
-    /* ── CONTACT SECTION ── */
-    .contact-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 56px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    /* ── Responsive ─────────────────────────────── */
+    @media (max-width: 920px) {
+      .ps-nav-inner { padding: 14px 20px; }
+      .ps-links { display: none; }
+      .ps-main { padding: 0 20px; }
+      .ps-section { padding: 56px 0; }
+      .ps-hero {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 56px 0;
+      }
+      .ps-hero-r { display: none; }
+      .ps-stat-row { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .ps-section-head { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .ps-grid { grid-template-columns: 1fr; }
+      .ps-card-grid { grid-template-columns: 1fr; }
+      .ps-foot { padding: 48px 20px 24px; }
+      .ps-foot-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .ps-foot-base { flex-direction: column; gap: 8px; }
     }
-    .contact-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 0%, rgba(79,142,247,0.08), transparent 60%);
-      pointer-events: none;
-    }
-    .contact-card h2 {
-      font-family: 'Outfit', sans-serif;
-      font-size: 2.2rem;
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-    .contact-card p { color: var(--muted); margin-bottom: 32px; }
-    .contact-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-
-    @media (max-width: 768px) {
-      nav { padding: 16px 20px; }
-      .nav-links { display: none; }
-      .section-inner { padding: 64px 20px; }
-      .apps-grid { grid-template-columns: 1fr; }
-      .stats { flex-wrap: wrap; }
-      .stat { min-width: 140px; }
-      .contact-card { padding: 36px 24px; }
-      footer { padding: 32px 20px; }
+    @media (max-width: 540px) {
+      .ps-foot-inner { grid-template-columns: 1fr; }
+      .ps-stat-row { grid-template-columns: 1fr 1fr; }
+      .ps-shots { grid-template-columns: repeat(3, 1fr); }
     }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <span class="nav-logo">Xerxz</span>
-  <ul class="nav-links">
-    <li><a href="#apps">Apps</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="hero-badge">Independent Developer · Sweden</div>
-  <h1>Apps built<br>with <span>passion</span></h1>
-  <p class="hero-sub">Companion tools, music apps, and game companions — crafted for players and musicians who demand quality.</p>
-  <div class="hero-cta">
-    <a href="#apps" class="btn-primary">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Explore Apps
-    </a>
-  </div>
-  <div class="hero-scroll">
-    <div class="scroll-line"></div>
-    <span>Scroll</span>
-  </div>
-</div>
-
-<!-- STATS -->
-<div class="stats">
-  <div class="stat">
-    <div class="stat-num">10+</div>
-    <div class="stat-label">Apps Published</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">Free</div>
-    <div class="stat-label">Core Apps</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">Android<br><small style="font-size:0.5em">+ iOS</small></div>
-    <div class="stat-label">Platforms</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">🇸🇪</div>
-    <div class="stat-label">Made in Sweden</div>
-  </div>
-</div>
-
-<!-- APPS SECTION -->
-<section id="apps">
-  <div class="section-inner">
-    <div class="section-tag">Portfolio</div>
-    <h2 class="section-title">All <span>Apps</span></h2>
-    <p class="section-sub">From game companions to music tools — each app built to solve a real need.</p>
-
-    <div class="apps-grid">
-
-      <!-- Arc Raiders -->
-      <div class="app-card">
-        <div class="app-card-art theme-blue">
-          <div class="art-icon">🛸</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Raiders Companion</div>
-            <span class="app-badge badge-paid">Paid</span>
-          </div>
-          <p class="app-card-desc">Interactive map, enemy tracker, and item database for Arc Raiders. Plan your raids, mark objectives, and never get lost in the wasteland.</p>
-          <div class="app-card-tags">
-            <span class="tag">Game Companion</span>
-            <span class="tag">Interactive Map</span>
-            <span class="tag">Arc Raiders</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=arc+raiders+companion+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <a class="btn-store btn-apple" href="https://apps.apple.com/search?term=raiders+companion+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-              App Store
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('arc-raiders')">Privacy Policy</button>
-          </div>
-        </div>
+<div class="ps-root">
+  <!-- ── NAV ────────────────────────────────────────────────────── -->
+  <header class="ps-nav">
+    <div class="ps-nav-inner">
+      <a class="ps-logo" href="#">
+        <span class="ps-mark">X</span>
+        <span>Xerxz</span>
+        <span class="ps-logo-tag">Studio</span>
+      </a>
+      <nav>
+        <ul class="ps-links">
+          <li><a href="#apps">Apps</a></li>
+          <li><a href="#support">Support</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="ps-nav-cta">
+        <a class="ps-btn-ghost" href="console.html">Sign in</a>
+        <a class="ps-btn" href="#apps">Browse apps</a>
       </div>
-
-      <!-- Chord Finder Pro -->
-      <div class="app-card">
-        <div class="app-card-art theme-purple">
-          <div class="art-icon">🎵</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Chord Finder Pro</div>
-            <span class="app-badge badge-paid">Paid</span>
-          </div>
-          <p class="app-card-desc">Identify any chord by ear or by notes. Perfect for guitarists, pianists, and songwriters who want to master music theory on the go.</p>
-          <div class="app-card-tags">
-            <span class="tag">Music</span>
-            <span class="tag">Guitar</span>
-            <span class="tag">Music Theory</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=chord+finder+pro+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('chord-finder-pro')">Privacy Policy</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Chord Finder 2 -->
-      <div class="app-card">
-        <div class="app-card-art theme-purple">
-          <div class="art-icon">🎸</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Chord Finder 2</div>
-            <span class="app-badge badge-ads">Ad Supported</span>
-          </div>
-          <p class="app-card-desc">The free version of Chord Finder with all the core features. Recognise chords, explore fingering charts, and level up your playing — at no cost.</p>
-          <div class="app-card-tags">
-            <span class="tag">Music</span>
-            <span class="tag">Free</span>
-            <span class="tag">Chords</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=chord+finder+2+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('chord-finder-2')">Privacy Policy</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Guitar Tuner -->
-      <div class="app-card">
-        <div class="app-card-art theme-green">
-          <div class="art-icon">🎶</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Guitar Tuner</div>
-            <span class="app-badge badge-free">Free</span>
-          </div>
-          <p class="app-card-desc">Fast, accurate chromatic tuner. Get in tune in seconds using your device's microphone — works for guitar, bass, ukulele, and more.</p>
-          <div class="app-card-tags">
-            <span class="tag">Music</span>
-            <span class="tag">Tuner</span>
-            <span class="tag">Chromatic</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=guitar+tuner+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('guitar-tuner')">Privacy Policy</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stratagems -->
-      <div class="app-card">
-        <div class="app-card-art theme-orange">
-          <div class="art-icon">🎮</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Stratagems</div>
-            <span class="app-badge badge-free">Free</span>
-          </div>
-          <p class="app-card-desc">Practice and master Helldivers 2 stratagem inputs with this swipe-based game. Earn upgrades, increase your score, and stay sharp on the battlefield.</p>
-          <div class="app-card-tags">
-            <span class="tag">Helldivers 2</span>
-            <span class="tag">Game</span>
-            <span class="tag">Training</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=stratagems+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <a class="btn-store btn-apple" href="https://apps.apple.com/search?term=stratagems+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-              App Store
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('stratagems')">Privacy Policy</button>
-            <a class="btn-store btn-policy" href="/delete-account" style="color:#ef4444;border-color:rgba(239,68,68,0.3);">Delete Account</a>
-          </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stratagems Watch Face -->
-      <div class="app-card">
-        <div class="app-card-art theme-orange">
-          <div class="art-icon">⌚</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Stratagems Watch Face</div>
-            <span class="app-badge badge-paid">Paid</span>
-          </div>
-          <p class="app-card-desc">Wear your democracy on your wrist. A Helldivers-themed Wear OS watch face with stratagem icons and a sleek tactical aesthetic.</p>
-          <div class="app-card-tags">
-            <span class="tag">Wear OS</span>
-            <span class="tag">Watch Face</span>
-            <span class="tag">Helldivers 2</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=stratagems+watch+face+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('stratagem-watch')">Privacy Policy</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stardew Valley Map -->
-      <div class="app-card">
-        <div class="app-card-art theme-green">
-          <div class="art-icon">🌾</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Stardew Valley Map</div>
-            <span class="app-badge badge-ads">Ad Supported</span>
-          </div>
-          <p class="app-card-desc">Interactive map for Stardew Valley. Find foraging spots, fishing locations, NPC schedules, and hidden secrets across Pelican Town and beyond.</p>
-          <div class="app-card-tags">
-            <span class="tag">Stardew Valley</span>
-            <span class="tag">Interactive Map</span>
-            <span class="tag">Free</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=stardew+valley+map+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('stardew')">Privacy Policy</button>
-          </div>
-        </div>
-      </div>
-     <!-- Zelda BotW Map -->
-      <div class="app-card">
-        <div class="app-card-art theme-rose">
-          <div class="art-icon">🗺️</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Zelda BotW Map</div>
-            <span class="app-badge badge-ads">Ad Supported</span>
-          </div>
-          <p class="app-card-desc">Interactive BotW map with Shrine & Korok tracking, cooking simulator & more</p>
-          <div class="app-card-tags">
-            <span class="tag">Zelda BotW</span>
-            <span class="tag">Open World</span>
-            <span class="tag">Map</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=zelda+botw+map+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('zelda-botw')">Privacy Policy</button>
-          </div>
-        </div>
-      </div>
-     <!-- Windrose Companion -->
-      <div class="app-card">
-        <div class="app-card-art theme-rose">
-          <div class="art-icon">🗺️</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Windrose Companion</div>
-            <span class="app-badge badge-ads">Ad Supported & Paid</span>
-          </div>
-          <p class="app-card-desc">Windrose Companion App, See item details, crafting helper, etc</p>
-          <div class="app-card-tags">
-            <span class="tag">Windrose</span>
-            <span class="tag">Open World</span>
-            <span class="tag">Map</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=windrose+companion+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('zelda-botw')">Privacy Policy</button>
-          </div>
-        </div>
-      </div>
-    
-      <!-- Crimson Desert Map -->
-      <div class="app-card">
-        <div class="app-card-art theme-rose">
-          <div class="art-icon">🗺️</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Crimson Desert Map</div>
-            <span class="app-badge badge-ads">Ad Supported</span>
-          </div>
-          <p class="app-card-desc">Navigate the harsh world of Crimson Desert with a detailed interactive map. Track bosses, dungeons, and points of interest across the open world.</p>
-          <div class="app-card-tags">
-            <span class="tag">Crimson Desert</span>
-            <span class="tag">Open World</span>
-            <span class="tag">Map</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=crimson+desert+map+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('crimson-desert')">Privacy Policy</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- GZW Companion -->
-      <div class="app-card">
-        <div class="app-card-art theme-cyan">
-          <div class="art-icon">🔫</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">GZW Companion</div>
-            <span class="app-badge badge-paid">Paid</span>
-          </div>
-          <p class="app-card-desc">Your tactical partner for Gray Zone Warfare. Maps, item data, extraction zones, and mission intel — all in one offline-capable companion app.</p>
-          <div class="app-card-tags">
-            <span class="tag">Gray Zone Warfare</span>
-            <span class="tag">Tactical</span>
-            <span class="tag">Companion</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=GZW+companion+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V .24z"/></svg>
-              Google Play
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('gzw')">Privacy Policy</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Where Winds Meet -->
-      <div class="app-card">
-        <div class="app-card-art theme-cyan">
-          <div class="art-icon">🌊</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-header">
-            <div class="app-card-name">Where Winds Meet</div>
-            <span class="app-badge badge-paid">Paid</span>
-          </div>
-          <p class="app-card-desc">Companion app for Where Winds Meet. Explore the world, track quests, and uncover all the secrets of this beautiful open-world action RPG.</p>
-          <div class="app-card-tags">
-            <span class="tag">Where Winds Meet</span>
-            <span class="tag">RPG</span>
-            <span class="tag">Companion</span>
-          </div>
-          <div class="app-card-actions">
-            <a class="btn-store btn-google" href="https://play.google.com/store/search?q=where+winds+meet+companion+xerxz" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg>
-              Google Play
-            </a>
-            <button class="btn-store btn-policy" onclick="openModal('wwm')">Privacy Policy</button>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </div>
-</section>
+  </header>
 
-<!-- CONTACT -->
-<section id="contact">
-  <div class="section-inner" style="padding-top:0">
-    <div class="contact-card">
-      <h2>Get in touch</h2>
-      <p>Questions, bug reports, suggestions, or just want to say hello?</p>
-      <div class="contact-links">
-        <a href="mailto:xerxz5115@gmail.com" class="btn-primary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
-          xerxz5115@gmail.com
+  <main class="ps-main">
+    <!-- ── HERO ─────────────────────────────────────────────────── -->
+    <section class="ps-hero">
+      <div class="ps-hero-l">
+        <div class="ps-eyebrow">
+          <span class="ps-dot"></span>
+          Independent · Sweden · Est. 2019
+        </div>
+        <h1 class="ps-h1">
+          Xerxz builds <em>companion tools</em>, music utilities,<br>
+          and game atlases for mobile.
+        </h1>
+        <p class="ps-lead">
+          A small studio of one. Twelve apps in active service across Android, iOS, and Wear&nbsp;OS — used by
+          players, musicians, and builders who want something quietly useful in their pocket.
+        </p>
+        <div class="ps-hero-cta">
+          <a class="ps-btn" href="#apps">View the catalog →</a>
+          <a class="ps-btn-ghost" href="#contact">Get in touch</a>
+        </div>
+        <div class="ps-stat-row">
+          <div><b>1.4M+</b><span>lifetime installs</span></div>
+          <div><b>4.5★</b><span>average rating</span></div>
+          <div><b>12</b><span>apps in service</span></div>
+          <div><b>4</b><span>storefronts</span></div>
+        </div>
+      </div>
+      <div class="ps-hero-r">
+        <div class="ps-mosaic" id="ps-mosaic"></div>
+      </div>
+    </section>
+
+    <!-- ── APPS ─────────────────────────────────────────────────── -->
+    <section id="apps" class="ps-section">
+      <div class="ps-section-head">
+        <div>
+          <div class="ps-eyebrow">Catalog · 12 apps</div>
+          <h2 class="ps-h2">Apps shipped from a small studio in Sweden.</h2>
+        </div>
+        <div class="ps-tabs" id="ps-tabs"></div>
+      </div>
+      <div class="ps-grid" id="ps-grid"></div>
+    </section>
+
+    <!-- ── SUPPORT ──────────────────────────────────────────────── -->
+    <section id="support" class="ps-section ps-support">
+      <div class="ps-eyebrow">Trust &amp; support</div>
+      <h2 class="ps-h2">Quietly serious about the boring stuff.</h2>
+      <div class="ps-support-grid">
+        <div class="ps-support-card">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="oklch(0.72 0.14 240)" d="M12 2 4 5v6c0 5 3.6 9.7 8 11 4.4-1.3 8-6 8-11V5Z"/></svg>
+          <div>
+            <div class="ps-support-t">Privacy first</div>
+            <div class="ps-support-d">Per-app privacy policies. No third-party tracking outside disclosed ad SDKs.</div>
+          </div>
+        </div>
+        <div class="ps-support-card">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="oklch(0.72 0.14 240)" d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.3 0-10 1.65-10 5v3h20v-3c0-3.35-6.7-5-10-5Z"/></svg>
+          <div>
+            <div class="ps-support-t">Account deletion</div>
+            <div class="ps-support-d">In-app and web request flow for account/data deletion within 30 days. <a href="delete-account.html" style="color:var(--accent)">Request now →</a></div>
+          </div>
+        </div>
+        <div class="ps-support-card">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="oklch(0.72 0.14 240)" d="M9.55 17.6 4.4 12.45l1.4-1.4 3.75 3.75 8.65-8.65 1.4 1.4Z"/></svg>
+          <div>
+            <div class="ps-support-t">app-ads.txt live</div>
+            <div class="ps-support-d">Verified for every monetized property. Updated quarterly.</div>
+          </div>
+        </div>
+        <div class="ps-support-card">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="oklch(0.72 0.14 240)" d="M11 21h-1l1-7H7.5L13 3h1l-1 7h3.5Z"/></svg>
+          <div>
+            <div class="ps-support-t">Real support</div>
+            <div class="ps-support-d">A human reads every email — usually replies the same week.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────────── -->
+  <footer id="contact" class="ps-foot">
+    <div class="ps-foot-inner">
+      <div>
+        <a class="ps-logo" href="#">
+          <span class="ps-mark">X</span>
+          <span>Xerxz</span>
         </a>
+        <p class="ps-foot-blurb">Built and shipped by one developer in Stockholm. Always a long-term project, never a startup.</p>
+      </div>
+      <div>
+        <div class="ps-foot-h">Catalog</div>
+        <ul>
+          <li><a href="#apps">All apps</a></li>
+          <li><a href="#" data-filter="Music utility">Music tools</a></li>
+          <li><a href="#" data-filter="Game map">Game maps</a></li>
+          <li><a href="#" data-filter="Wear OS">Wear OS</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="ps-foot-h">Trust</div>
+        <ul>
+          <li><a href="#apps">Privacy policies</a></li>
+          <li><a href="delete-account.html">Account deletion</a></li>
+          <li><a href="app-ads.txt">app-ads.txt</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="ps-foot-h">Contact</div>
+        <ul>
+          <li><a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a></li>
+          <li><a href="console.html">Console</a></li>
+        </ul>
       </div>
     </div>
-  </div>
-</section>
+    <div class="ps-foot-base">
+      <span>© 2026 Xerxz</span>
+      <span>v3.4.0 · Stockholm</span>
+    </div>
+  </footer>
+</div>
 
-<!-- FOOTER -->
-<footer>
-  <p>© 2025 Xerxz. All rights reserved. &nbsp;·&nbsp; Independent developer based in Sweden &nbsp;·&nbsp; <a href="mailto:xerxz5115@gmail.com">Contact</a></p>
-  <p style="margin-top:8px;font-size:0.75rem;opacity:0.5;">All game names and trademarks are property of their respective owners. This site is not affiliated with any game studios.</p>
-</footer>
-
-<!-- MODAL -->
-<div class="modal-backdrop" id="modal-backdrop" onclick="closeModalOnBackdrop(event)">
+<!-- ── Privacy policy modal ─────────────────────────────────────── -->
+<div class="modal-backdrop" id="modal-backdrop">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+    <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
     <div class="modal-content" id="modal-content"></div>
   </div>
 </div>
 
 <script>
-  const policies = {
-    'arc-raiders': `<h2>🛸 Arc Raiders Companion – Privacy Policy</h2><p>Xerxz built the Arc Raiders Companion app as a paid app. Personal information you provide is retained on your device and is not collected by us. Third-party services (Google Play Services, AdMob) may collect usage data.</p><p><strong>Log Data:</strong> On errors, device info including IP address, OS version, and timestamps may be collected via third-party tools.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
-    'chord-finder-pro': `<h2>🎵 Chord Finder Pro – Privacy Policy</h2><p><em>Last updated: August 20, 2024</em></p><p>We use your Personal Data to provide and improve the Service. Usage Data (IP address, device info, visit timestamps) is collected automatically. Data is processed in Sweden and may be transferred internationally with adequate safeguards.</p><p><strong>Your rights:</strong> You may request deletion of your personal data at any time.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a></p>`,
-    'chord-finder-2': `<h2>🎸 Chord Finder 2 – Privacy Policy</h2><p>Xerxz built Chord Finder 2 as an ad-supported free app. Personal information (including audio) is retained on your device only. Third-party services (Google Play Services, AdMob) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
-    'guitar-tuner': `<h2>🎶 Guitar Tuner – Privacy Policy</h2><p>Xerxz built Guitar Tuner as a free app. Audio data is retained on your device and not collected by us. Third-party services (Google Play Services, AdMob) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
-    'stratagems': `<h2>🎮 Stratagems – Privacy Policy</h2><p>Xerxz built the Stratagems app as a free service. Personal information is retained on your device. Third-party services (Google Play Services, AdMob, Firebase) may collect usage data.</p><p><strong>Account Data:</strong> When you sign in with Google, we store your profile, scores, samples, inventory, and game statistics in Firebase Firestore. This data is linked to your Google account.</p><p><strong>Account Deletion:</strong> You may request deletion of your account and all associated data at any time by visiting <a href="/delete-account">xerxz.github.io/delete-account</a> or by emailing us directly. Requests are processed within 7 business days.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2025-04-05</p>`,
-    'stratagem-watch': `<h2>⌚ Stratagems Watch Face – Privacy Policy</h2><p><em>Last updated: August 20, 2024</em></p><p>Usage Data (IP address, device info, visit timestamps) is collected automatically. Data is processed in Sweden. You have the right to delete your personal data at any time.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a></p>`,
-    'stardew': `<h2>🌾 Stardew Valley Map – Privacy Policy</h2><p>Xerxz built the Stardew Valley Map as a free ad-supported app. Personal information is retained on your device. Third-party services (Google Play Services) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
-    'crimson-desert': `<h2>🗺️ Crimson Desert Map – Privacy Policy</h2><p>Xerxz built the Crimson Desert Map as a paid ad-supported app. Personal information is retained on your device. Third-party services (Google Play Services) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
-    'zelda-botw': `<h2>🗺️ Zelda BotW Map & Tracker – Privacy Policy</h2><p>Xerxz built the Zelda BotW Map & Tracker as a paid ad-supported app. Personal information is retained on your device. Third-party services (Google Play Services) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
-    'zelda-botw': `<h2>🗺️ Windrose Companion – Privacy Policy</h2><p>Xerxz built the Windrose Companion as a paid ad-supported app. Personal information is retained on your device. Third-party services (Google Play Services) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
-    'gzw': `<h2>🔫 GZW Companion – Privacy Policy</h2><p>Xerxz built the GZW Companion app as a paid app. Personal information is retained on your device. Third-party services (Google Play Services, AdMob) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
-    'wwm': `<h2>🌊 Where Winds Meet – Privacy Policy</h2><p>Xerxz built the Where Winds Meet app as a paid app. Personal information is retained on your device. Third-party services (Google Play Services, AdMob) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
+  // ── App catalog ───────────────────────────────────────────────────
+  const APPS = [
+    { id:'raiders',  name:'Raiders Companion',     cat:'Game companion', platforms:['android','ios'], monet:'Free + ads',     color:'oklch(0.62 0.16 25)',  glyph:'R',  desc:'Strategy & loadout planner for Raiders.', play:'https://play.google.com/store/search?q=arc+raiders+companion+xerxz', apple:'https://apps.apple.com/search?term=raiders+companion+xerxz', listing:'arc-raiders.html', policy:'arc-raiders' },
+    { id:'chordpro', name:'Chord Finder Pro',      cat:'Music utility',  platforms:['android'],       monet:'Paid',           color:'oklch(0.68 0.14 200)', glyph:'C+', desc:'Reverse chord lookup & voicings for guitarists.', play:'https://play.google.com/store/search?q=chord+finder+pro+xerxz', listing:'chord_finder_pro.html', policy:'chord-finder-pro' },
+    { id:'chord2',   name:'Chord Finder 2',        cat:'Music utility',  platforms:['android','ios'], monet:'Free + IAP',     color:'oklch(0.7 0.13 220)',  glyph:'C2', desc:'Next-gen chord library with progressions & ear training.', play:'https://play.google.com/store/search?q=chord+finder+2+xerxz', listing:'chord_finder_2.html', policy:'chord-finder-2' },
+    { id:'tuner',    name:'Guitar Tuner',          cat:'Music utility',  platforms:['android','ios'], monet:'Free + ads',     color:'oklch(0.72 0.13 160)', glyph:'GT', desc:'Pitch-perfect tuner with alt tunings.', play:'https://play.google.com/store/search?q=guitar+tuner+xerxz', listing:'guitar_tuner.html', policy:'guitar-tuner' },
+    { id:'strat',    name:'Stratagems',            cat:'Game companion', platforms:['android','ios'], monet:'Free + ads',     color:'oklch(0.74 0.14 75)',  glyph:'St', desc:'Stratagem trainer & loadout reference.', play:'https://play.google.com/store/search?q=stratagems+xerxz', apple:'https://apps.apple.com/search?term=stratagems+xerxz', listing:'stratagems.html', policy:'stratagems' },
+    { id:'stratwf',  name:'Stratagems Watch Face', cat:'Wear OS',        platforms:['android'],       monet:'Paid',           color:'oklch(0.76 0.12 80)',  glyph:'SW', desc:'On-wrist stratagem deck for Wear OS.', play:'https://play.google.com/store/search?q=stratagems+watch+face+xerxz', listing:'stratagem_watch_face.html', policy:'stratagem-watch' },
+    { id:'stardew',  name:'Stardew Valley Map',    cat:'Game map',       platforms:['android'],       monet:'Free + ads',     color:'oklch(0.74 0.13 130)', glyph:'SV', desc:'Interactive farm & town map.', play:'https://play.google.com/store/search?q=stardew+valley+map+xerxz', listing:'stardewvalley.html', policy:'stardew' },
+    { id:'zelda',    name:'Zelda BotW Map',        cat:'Game map',       platforms:['android','ios'], monet:'Free + IAP',     color:'oklch(0.72 0.14 145)', glyph:'Z',  desc:'Korok seeds, shrines, quests, treasure.', play:'https://play.google.com/store/search?q=zelda+botw+map+xerxz', listing:'zeldabotw.html', policy:'zelda-botw' },
+    { id:'windrose', name:'Windrose Companion',    cat:'Game companion', platforms:['android','ios'], monet:'Free + ads',     color:'oklch(0.7 0.13 250)',  glyph:'Wr', desc:'Field guide & build planner.', play:'https://play.google.com/store/search?q=windrose+companion+xerxz', listing:'windrose.html', policy:'windrose' },
+    { id:'crimson',  name:'Crimson Desert Map',    cat:'Game map',       platforms:['android','ios'], monet:'Free + ads',     color:'oklch(0.66 0.16 30)',  glyph:'CD', desc:'World map, lore nodes, fast-travel.', play:'https://play.google.com/store/search?q=crimson+desert+map+xerxz', listing:'crimsondesert.html', policy:'crimson-desert' },
+    { id:'gzw',      name:'GZW Companion',         cat:'Game companion', platforms:['android','ios'], monet:'Free + ads',     color:'oklch(0.62 0.13 30)',  glyph:'GZ', desc:'Gray Zone Warfare ops & loot tracker.', play:'https://play.google.com/store/search?q=GZW+companion+xerxz', listing:'gzw.html', policy:'gzw' },
+    { id:'wwm',      name:'Where Winds Meet',      cat:'Game map',       platforms:['android','ios'], monet:'Free + ads',     color:'oklch(0.7 0.12 200)',  glyph:'WM', desc:'Open-world atlas & quest tracker.', play:'https://play.google.com/store/search?q=where+winds+meet+companion+xerxz', listing:'wwm.html', policy:'wwm' },
+  ];
+
+  const CATEGORIES = ['All','Game companion','Game map','Music utility','Wear OS'];
+
+  // ── Privacy policy bodies ─────────────────────────────────────────
+  const POLICIES = {
+    'arc-raiders':       `<h2>Raiders Companion · Privacy Policy</h2><p>Xerxz built Raiders Companion as a paid app. Personal information you provide is retained on your device and is not collected by us. Third-party services (Google Play Services, AdMob) may collect usage data.</p><p><strong>Log Data:</strong> On errors, device info including IP address, OS version, and timestamps may be collected via third-party tools.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
+    'chord-finder-pro':  `<h2>Chord Finder Pro · Privacy Policy</h2><p><em>Last updated: August 20, 2024</em></p><p>We use your Personal Data to provide and improve the Service. Usage Data (IP address, device info, visit timestamps) is collected automatically. Data is processed in Sweden and may be transferred internationally with adequate safeguards.</p><p><strong>Your rights:</strong> You may request deletion of your personal data at any time.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a></p>`,
+    'chord-finder-2':    `<h2>Chord Finder 2 · Privacy Policy</h2><p>Xerxz built Chord Finder 2 as an ad-supported free app. Personal information (including audio) is retained on your device only. Third-party services (Google Play Services, AdMob) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
+    'guitar-tuner':      `<h2>Guitar Tuner · Privacy Policy</h2><p>Xerxz built Guitar Tuner as a free app. Audio data is retained on your device and not collected by us. Third-party services (Google Play Services, AdMob) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
+    'stratagems':        `<h2>Stratagems · Privacy Policy</h2><p>Xerxz built Stratagems as a free service. Personal information is retained on your device. Third-party services (Google Play Services, AdMob, Firebase) may collect usage data.</p><p><strong>Account Data:</strong> When you sign in with Google, we store your profile, scores, samples, inventory, and game statistics in Firebase Firestore. This data is linked to your Google account.</p><p><strong>Account Deletion:</strong> You may request deletion at any time via <a href="delete-account.html">delete-account</a> or by emailing us. Requests are processed within 7 business days.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2025-04-05</p>`,
+    'stratagem-watch':   `<h2>Stratagems Watch Face · Privacy Policy</h2><p><em>Last updated: August 20, 2024</em></p><p>Usage Data (IP address, device info, visit timestamps) is collected automatically. Data is processed in Sweden. You have the right to delete your personal data at any time.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a></p>`,
+    'stardew':           `<h2>Stardew Valley Map · Privacy Policy</h2><p>Xerxz built the Stardew Valley Map as a free ad-supported app. Personal information is retained on your device. Third-party services (Google Play Services) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
+    'crimson-desert':    `<h2>Crimson Desert Map · Privacy Policy</h2><p>Xerxz built the Crimson Desert Map as an ad-supported app. Personal information is retained on your device. Third-party services (Google Play Services) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
+    'zelda-botw':        `<h2>Zelda BotW Map · Privacy Policy</h2><p>Xerxz built the Zelda BotW Map &amp; Tracker as an ad-supported app. Personal information is retained on your device. Third-party services (Google Play Services) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
+    'windrose':          `<h2>Windrose Companion · Privacy Policy</h2><p>Xerxz built the Windrose Companion as an ad-supported app. Personal information is retained on your device. Third-party services (Google Play Services) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
+    'gzw':               `<h2>GZW Companion · Privacy Policy</h2><p>Xerxz built the GZW Companion app as an ad-supported app. Personal information is retained on your device. Third-party services (Google Play Services, AdMob) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
+    'wwm':               `<h2>Where Winds Meet · Privacy Policy</h2><p>Xerxz built the Where Winds Meet companion app. Personal information is retained on your device. Third-party services (Google Play Services, AdMob) may collect usage data.</p><p><strong>Children:</strong> The service does not address anyone under 13.</p><p><strong>Contact:</strong> <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br><strong>Effective:</strong> 2021-05-19</p>`,
   };
 
-  function openModal(id) {
-    document.getElementById('modal-content').innerHTML = policies[id] || '<p>Policy not found.</p>';
-    document.getElementById('modal-backdrop').classList.add('open');
+  // ── App icon SVG generator ────────────────────────────────────────
+  function appIconHTML(app, size){
+    const seed = app.id.charCodeAt(0) + app.id.charCodeAt(app.id.length - 1);
+    const r = Math.round(size * 0.24);
+    const fontSize = size * 0.36;
+    return `
+      <div class="app-icon" style="width:${size}px;height:${size}px;border-radius:${r}px;background:linear-gradient(135deg, ${app.color}, oklch(from ${app.color} calc(l*0.7) calc(c*0.9) h));">
+        <svg class="app-icon-blob" viewBox="0 0 40 40" width="${size}" height="${size}">
+          <circle cx="${6 + seed % 10}" cy="${6 + seed % 7}" r="14" fill="rgba(255,255,255,0.12)"/>
+          <circle cx="${34 - seed % 6}" cy="${32 - seed % 5}" r="9" fill="rgba(0,0,0,0.18)"/>
+        </svg>
+        <div class="app-icon-glyph" style="font-size:${fontSize}px">${app.glyph}</div>
+      </div>`;
+  }
+
+  function platformsHTML(platforms){
+    let s = '<span class="ps-platforms">';
+    if (platforms.includes('android'))
+      s += '<svg width="13" height="13" viewBox="0 0 24 24"><path fill="currentColor" d="M7 1h10a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2Zm5 19a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 12 20Zm5-3V4H7v13Z"/></svg>';
+    if (platforms.includes('ios'))
+      s += '<svg width="13" height="13" viewBox="0 0 24 24"><path fill="currentColor" d="M16.36 13.31c-.02-2.65 2.16-3.93 2.26-3.99a4.86 4.86 0 0 0-3.83-2.07c-1.62-.16-3.18.95-4 .95s-2.1-.93-3.46-.9a5.1 5.1 0 0 0-4.3 2.62c-1.86 3.21-.47 7.94 1.31 10.55.88 1.28 1.92 2.71 3.27 2.66 1.31-.05 1.81-.85 3.4-.85s2.04.85 3.42.83c1.41-.03 2.31-1.3 3.16-2.59a10.45 10.45 0 0 0 1.43-2.95 4.42 4.42 0 0 1-2.66-4.26ZM13.84 5.55a4.4 4.4 0 0 0 1-3.18 4.45 4.45 0 0 0-2.91 1.5 4.16 4.16 0 0 0-1.04 3.06 3.7 3.7 0 0 0 2.95-1.38Z"/></svg>';
+    s += '</span>';
+    return s;
+  }
+
+  // ── Render hero mosaic ────────────────────────────────────────────
+  const featuredOrder = ['zelda','strat','chord2','tuner','stardew','gzw','crimson','wwm','raiders','windrose','chordpro','stratwf'];
+  const mosaicEl = document.getElementById('ps-mosaic');
+  featuredOrder.forEach((id, i) => {
+    const a = APPS.find(x => x.id === id);
+    if (!a) return;
+    const cell = document.createElement('div');
+    cell.className = 'ps-mosaic-cell';
+    cell.style.animationDelay = (i * 60) + 'ms';
+    cell.innerHTML = appIconHTML(a, 56);
+    mosaicEl.appendChild(cell);
+  });
+
+  // ── Render category tabs + apps grid ──────────────────────────────
+  let activeFilter = 'All';
+  const tabsEl = document.getElementById('ps-tabs');
+  const gridEl = document.getElementById('ps-grid');
+
+  function renderTabs(){
+    tabsEl.innerHTML = CATEGORIES.map(c =>
+      `<button class="ps-tab ${c === activeFilter ? 'on' : ''}" data-cat="${c}">${c}</button>`
+    ).join('');
+    tabsEl.querySelectorAll('.ps-tab').forEach(b => {
+      b.addEventListener('click', () => {
+        activeFilter = b.dataset.cat;
+        renderTabs();
+        renderGrid();
+      });
+    });
+  }
+
+  function renderGrid(){
+    const items = activeFilter === 'All' ? APPS : APPS.filter(a => a.cat === activeFilter);
+    gridEl.innerHTML = items.map(app => `
+      <article class="ps-card" data-app="${app.id}">
+        <button class="ps-card-head" type="button" aria-expanded="false">
+          ${appIconHTML(app, 56)}
+          <div class="ps-card-title">
+            <div class="ps-card-name">${app.name}</div>
+            <div class="ps-card-meta">
+              <span class="ps-tag">${app.cat}</span>
+              ${platformsHTML(app.platforms)}
+              <span class="ps-card-monet">${app.monet}</span>
+            </div>
+          </div>
+          <svg class="ps-chev" viewBox="0 0 24 24"><path fill="currentColor" d="M9 6l6 6-6 6V6Z"/></svg>
+        </button>
+      </article>
+    `).join('');
+
+    gridEl.querySelectorAll('.ps-card').forEach(card => {
+      card.querySelector('.ps-card-head').addEventListener('click', () => toggleCard(card));
+    });
+  }
+
+  function toggleCard(card){
+    const id = card.dataset.app;
+    const app = APPS.find(a => a.id === id);
+    const isOpen = card.classList.contains('open');
+
+    gridEl.querySelectorAll('.ps-card.open').forEach(c => {
+      c.classList.remove('open');
+      const body = c.querySelector('.ps-card-body');
+      if (body) body.remove();
+      c.querySelector('.ps-card-head').setAttribute('aria-expanded', 'false');
+    });
+
+    if (isOpen) return;
+
+    card.classList.add('open');
+    card.querySelector('.ps-card-head').setAttribute('aria-expanded', 'true');
+
+    const shotGradient = `linear-gradient(160deg, oklch(from ${app.color} calc(l*0.45) calc(c*0.9) h), oklch(from ${app.color} calc(l*0.25) c h))`;
+    const body = document.createElement('div');
+    body.className = 'ps-card-body';
+    body.innerHTML = `
+      <p class="ps-card-desc">${app.desc}</p>
+      <div class="ps-shots">
+        ${[1,2,3].map(i => `
+          <div class="ps-shot" style="background:${shotGradient}">
+            <div class="ps-shot-overlay">
+              <div class="ps-shot-bar"></div>
+              <div class="ps-shot-bar w70"></div>
+              <div class="ps-shot-bar w50"></div>
+              <div class="ps-shot-img"></div>
+            </div>
+            <div class="ps-shot-tag">screen ${i}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="ps-card-grid">
+        <div>
+          <div class="ps-mini-label">Highlights</div>
+          <ul class="ps-bullets">
+            <li>Offline-first; works without an account.</li>
+            <li>Localized in 8 languages.</li>
+            <li>Updated within the last 30 days.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="ps-mini-label">Support &amp; legal</div>
+          <ul class="ps-links-list">
+            <li><a href="#" data-policy="${app.policy}"><svg width="12" height="12" viewBox="0 0 24 24"><path fill="currentColor" d="M10.6 13.4a3 3 0 0 0 4.2 0l3-3a3 3 0 0 0-4.2-4.2l-1 1 1.4 1.4 1-1a1 1 0 0 1 1.4 1.4l-3 3a1 1 0 0 1-1.4 0Zm2.8-2.8a3 3 0 0 0-4.2 0l-3 3a3 3 0 0 0 4.2 4.2l1-1-1.4-1.4-1 1a1 1 0 0 1-1.4-1.4l3-3a1 1 0 0 1 1.4 0Z"/></svg> Privacy policy</a></li>
+            <li><a href="delete-account.html"><svg width="12" height="12" viewBox="0 0 24 24"><path fill="currentColor" d="M10.6 13.4a3 3 0 0 0 4.2 0l3-3a3 3 0 0 0-4.2-4.2l-1 1 1.4 1.4 1-1a1 1 0 0 1 1.4 1.4l-3 3a1 1 0 0 1-1.4 0Zm2.8-2.8a3 3 0 0 0-4.2 0l-3 3a3 3 0 0 0 4.2 4.2l1-1-1.4-1.4-1 1a1 1 0 0 1-1.4-1.4l3-3a1 1 0 0 1 1.4 0Z"/></svg> Account / data deletion</a></li>
+            <li><a href="mailto:xerxz5115@gmail.com"><svg width="12" height="12" viewBox="0 0 24 24"><path fill="currentColor" d="M10.6 13.4a3 3 0 0 0 4.2 0l3-3a3 3 0 0 0-4.2-4.2l-1 1 1.4 1.4 1-1a1 1 0 0 1 1.4 1.4l-3 3a1 1 0 0 1-1.4 0Zm2.8-2.8a3 3 0 0 0-4.2 0l-3 3a3 3 0 0 0 4.2 4.2l1-1-1.4-1.4-1 1a1 1 0 0 1-1.4-1.4l3-3a1 1 0 0 1 1.4 0Z"/></svg> Support email</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ps-card-actions">
+        ${app.platforms.includes('android') ? `<a class="ps-store" href="${app.play}" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24"><path fill="currentColor" d="M3.18 23.76c.39.22.84.24 1.24.04l13.48-7.78-2.95-2.95L3.18 23.76zm16.8-9.7L17.1 12l2.88-2.06L5.22.16C4.82-.04 4.37-.02 3.98.2L16.73 12 3.98 23.8c.39.22.84.24 1.24.04l14.76-8.51c.61-.35.61-1.22 0-1.57zM3.18.24l11.77 11.77L11.95 15 3.18 7.73V.24z"/></svg> Google Play</a>` : ''}
+        ${app.platforms.includes('ios') && app.apple ? `<a class="ps-store" href="${app.apple}" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24"><path fill="currentColor" d="M16.36 13.31c-.02-2.65 2.16-3.93 2.26-3.99a4.86 4.86 0 0 0-3.83-2.07c-1.62-.16-3.18.95-4 .95s-2.1-.93-3.46-.9a5.1 5.1 0 0 0-4.3 2.62c-1.86 3.21-.47 7.94 1.31 10.55.88 1.28 1.92 2.71 3.27 2.66 1.31-.05 1.81-.85 3.4-.85s2.04.85 3.42.83c1.41-.03 2.31-1.3 3.16-2.59a10.45 10.45 0 0 0 1.43-2.95 4.42 4.42 0 0 1-2.66-4.26ZM13.84 5.55a4.4 4.4 0 0 0 1-3.18 4.45 4.45 0 0 0-2.91 1.5 4.16 4.16 0 0 0-1.04 3.06 3.7 3.7 0 0 0 2.95-1.38Z"/></svg> App Store</a>` : ''}
+        ${app.listing ? `<a class="ps-store ghost" href="${app.listing}"><svg width="12" height="12" viewBox="0 0 24 24"><path fill="currentColor" d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14Zm-2 4H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7h-2v7H5V9h7Z"/></svg> Listing page</a>` : ''}
+      </div>
+    `;
+
+    card.appendChild(body);
+    body.querySelectorAll('a[data-policy]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        openModal(a.dataset.policy);
+      });
+    });
+  }
+
+  renderTabs();
+  renderGrid();
+
+  // Footer category links jump + filter
+  document.querySelectorAll('a[data-filter]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      activeFilter = a.dataset.filter;
+      renderTabs();
+      renderGrid();
+      document.getElementById('apps').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // ── Modal ─────────────────────────────────────────────────────────
+  const modalEl = document.getElementById('modal-backdrop');
+  const modalContent = document.getElementById('modal-content');
+
+  function openModal(id){
+    modalContent.innerHTML = POLICIES[id] || '<p>Policy not found.</p>';
+    modalEl.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
-  function closeModal() {
-    document.getElementById('modal-backdrop').classList.remove('open');
+  function closeModal(){
+    modalEl.classList.remove('open');
     document.body.style.overflow = '';
   }
-  function closeModalOnBackdrop(e) {
-    if (e.target === document.getElementById('modal-backdrop')) closeModal();
-  }
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  modalEl.addEventListener('click', e => { if (e.target === modalEl) closeModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 </script>
 

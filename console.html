@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xerxz Console</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #08090d;
+      --surface: #0c0e14;
+      --surface-2: #11141d;
+      --surface-3: #161a25;
+      --border: rgba(255,255,255,0.07);
+      --border-2: rgba(255,255,255,0.04);
+      --text: #e6e8ef;
+      --text-dim: rgba(230,232,239,0.62);
+      --text-mute: rgba(230,232,239,0.4);
+      --accent: oklch(0.72 0.14 240);
+      --accent-soft: oklch(0.72 0.14 240 / 0.14);
+      --accent-line: oklch(0.72 0.14 240 / 0.28);
+      --good: oklch(0.74 0.14 150);
+      --warn: oklch(0.78 0.14 75);
+      --bad: oklch(0.7 0.16 25);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 400;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+
+    .ps-mark {
+      display: inline-grid; place-items: center;
+      width: 22px; height: 22px; border-radius: 6px;
+      background: linear-gradient(135deg, oklch(0.72 0.14 240), oklch(0.6 0.14 260));
+      color: #fff; font-weight: 700; font-size: 12px;
+      box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.18), 0 1px 2px rgba(0,0,0,0.4);
+      font-family: 'Outfit', sans-serif;
+    }
+    .ps-mark.sm { width: 18px; height: 18px; font-size: 10px; border-radius: 5px; }
+    .ps-logo-tag {
+      font-size: 10.5px; font-weight: 500; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--text-mute);
+      padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px;
+      margin-left: 4px;
+    }
+    .mono { font-variant-numeric: tabular-nums; }
+    .r { text-align: right; }
+
+    /* ── LOGIN ────────────────────────────────────────────────── */
+    .login-root {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .login-aside {
+      padding: 48px;
+      background: linear-gradient(160deg, oklch(0.18 0.04 250), oklch(0.1 0.02 245));
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .login-mark {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px;
+    }
+    .login-aside-body { max-width: 460px; }
+    .login-h {
+      font-family: 'Outfit', sans-serif; font-weight: 600;
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .login-p { color: var(--text-dim); font-size: 14.5px; margin-bottom: 24px; }
+    .login-checks { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .login-checks li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13.5px; color: var(--text-dim);
+    }
+    .login-foot-aside { color: var(--text-mute); font-size: 12.5px; }
+    .login-foot-aside a:hover { color: var(--text); }
+
+    .login-panel {
+      padding: 48px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 24px;
+    }
+    .login-card {
+      width: 100%; max-width: 400px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .login-eyebrow {
+      font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--accent);
+    }
+    .login-h2 {
+      font-family: 'Outfit', sans-serif; font-weight: 600;
+      font-size: 22px; letter-spacing: -0.015em;
+    }
+    .login-sub { color: var(--text-dim); font-size: 13.5px; }
+    .login-google {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 12px; border-radius: 8px;
+      background: var(--text); color: #0b0c10;
+      border: none; font-weight: 500; font-size: 13.5px;
+      transition: opacity 0.15s;
+    }
+    .login-google:hover:not(:disabled) { background: #fff; }
+    .login-google:disabled { opacity: 0.7; cursor: progress; }
+    .login-or {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--text-mute); font-size: 11.5px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .login-or::before, .login-or::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .login-field { display: flex; flex-direction: column; gap: 6px; }
+    .login-field span {
+      font-size: 11.5px; font-weight: 500;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--text-mute);
+    }
+    .login-field input {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px; border-radius: 8px;
+      font-family: inherit; font-size: 13.5px;
+      outline: none; transition: border-color 0.15s;
+    }
+    .login-field input:focus { border-color: var(--accent-line); }
+    .login-secondary {
+      padding: 11px; border-radius: 8px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text); font-weight: 500; font-size: 13.5px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .login-secondary:hover:not(:disabled) {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.14);
+    }
+    .login-note {
+      display: flex; gap: 8px;
+      padding: 10px 12px; border-radius: 8px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-line);
+      font-size: 12px; color: var(--text-dim); line-height: 1.5;
+    }
+    .login-note svg { flex-shrink: 0; margin-top: 2px; }
+    .login-foot {
+      display: flex; gap: 8px; align-items: center;
+      color: var(--text-mute); font-size: 12px;
+    }
+    .login-foot a:hover { color: var(--text); }
+
+    @media (max-width: 820px) {
+      .login-root { grid-template-columns: 1fr; }
+      .login-aside { padding: 32px 24px; }
+      .login-panel { padding: 32px 24px; }
+    }
+
+    /* ── DASHBOARD SHELL ──────────────────────────────────────── */
+    .dx-root {
+      display: grid;
+      grid-template-columns: 232px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .dx-side {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 16px 12px;
+      gap: 14px;
+      position: sticky; top: 0; height: 100vh;
+    }
+    .dx-side-brand {
+      display: flex; align-items: center; gap: 10px;
+      padding: 4px 8px 12px;
+      border-bottom: 1px solid var(--border-2);
+    }
+    .dx-brand-t {
+      font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px;
+    }
+    .dx-brand-s {
+      font-size: 11px; color: var(--text-mute); letter-spacing: 0.02em;
+    }
+    .dx-nav {
+      display: flex; flex-direction: column; gap: 2px;
+      flex: 1; overflow-y: auto;
+    }
+    .dx-nav-h {
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-mute);
+      padding: 14px 8px 4px;
+    }
+    .dx-nav-h:first-child { padding-top: 4px; }
+    .dx-nav-i {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 8px;
+      background: transparent; border: none;
+      color: var(--text-dim);
+      font-size: 13px; font-weight: 500;
+      border-radius: 6px;
+      transition: background 0.12s, color 0.12s;
+      text-align: left;
+    }
+    .dx-nav-i:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .dx-nav-i.on {
+      background: var(--surface-2);
+      color: var(--text);
+      box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .dx-nav-i > span:first-of-type { flex: 1; }
+    .dx-badge {
+      font-size: 10px; padding: 2px 6px; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent);
+      font-weight: 600; font-variant-numeric: tabular-nums;
+    }
+    .dx-badge.warn { background: oklch(0.7 0.16 25 / 0.14); color: var(--bad); }
+    .dx-side-foot {
+      padding-top: 12px; border-top: 1px solid var(--border-2);
+    }
+    .dx-user {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px;
+    }
+    .dx-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, oklch(0.72 0.14 240), oklch(0.6 0.14 290));
+      color: #fff; font-weight: 600; font-size: 11px;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .dx-user-meta { flex: 1; min-width: 0; overflow: hidden; }
+    .dx-user-n {
+      font-size: 12.5px; font-weight: 500; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .dx-user-e {
+      font-size: 11px; color: var(--text-mute);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .dx-icon-btn {
+      background: transparent; border: none;
+      width: 26px; height: 26px;
+      display: grid; place-items: center;
+      color: var(--text-mute); border-radius: 6px;
+      transition: background 0.12s, color 0.12s;
+    }
+    .dx-icon-btn:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+
+    /* Main */
+    .dx-main { display: flex; flex-direction: column; min-width: 0; }
+
+    .dx-top {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 24px;
+      background: rgba(8,9,13,0.85);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      gap: 16px; flex-wrap: wrap;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .dx-crumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12.5px; color: var(--text-mute);
+    }
+    .dx-crumb-cur { color: var(--text); font-weight: 500; }
+    .dx-top-r { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .dx-seg {
+      display: inline-flex; padding: 2px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 7px; gap: 1px;
+    }
+    .dx-seg button {
+      background: transparent; border: none; color: var(--text-dim);
+      font-size: 12px; font-weight: 500;
+      padding: 5px 10px; border-radius: 5px;
+      transition: background 0.12s, color 0.12s;
+    }
+    .dx-seg button:hover { color: var(--text); }
+    .dx-seg button.on {
+      background: var(--surface-2); color: var(--text);
+      box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .dx-select {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: inherit; font-size: 12.5px;
+      padding: 6px 10px; padding-right: 24px; border-radius: 7px;
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(230,232,239,0.5)' d='M0 0h10L5 6z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      cursor: pointer;
+    }
+    .dx-toggle, .dx-btn-ghost, .dx-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 11px; border-radius: 7px;
+      font-size: 12.5px; font-weight: 500; line-height: 1;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+      border: 1px solid var(--border);
+    }
+    .dx-toggle {
+      background: var(--surface); color: var(--text-dim);
+    }
+    .dx-toggle.on {
+      background: var(--accent-soft); color: var(--accent);
+      border-color: var(--accent-line);
+    }
+    .dx-btn-ghost {
+      background: var(--surface); color: var(--text);
+    }
+    .dx-btn-ghost:hover {
+      background: var(--surface-2); border-color: rgba(255,255,255,0.14);
+    }
+    .dx-btn {
+      background: var(--text); color: #0b0c10; border-color: transparent;
+    }
+    .dx-btn:hover { background: #fff; }
+    .dx-link-btn {
+      background: transparent; border: none;
+      color: var(--accent); font-size: 12px; font-weight: 500;
+      padding: 4px 6px; border-radius: 5px;
+      transition: background 0.12s;
+    }
+    .dx-link-btn:hover { background: var(--accent-soft); }
+
+    @keyframes dx-spin { to { transform: rotate(360deg); } }
+
+    .dx-page { padding: 20px 24px 64px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* Anomaly bar */
+    .dx-anom-bar {
+      display: flex; align-items: center; gap: 18px;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      flex-wrap: wrap;
+    }
+    .dx-anom-l { display: flex; align-items: center; gap: 8px; }
+    .dx-anom-h {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-mute);
+    }
+    .dx-anom-list { display: flex; gap: 16px; flex: 1; flex-wrap: wrap; }
+    .dx-anom {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12.5px; color: var(--text);
+    }
+    .dx-anom-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--bad);
+    }
+    .dx-sev-med .dx-anom-dot { background: var(--warn); }
+    .dx-sev-good .dx-anom-dot { background: var(--good); }
+    .dx-anom-t { font-weight: 500; }
+    .dx-anom-when { color: var(--text-mute); font-size: 11.5px; }
+
+    /* KPIs */
+    .dx-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .dx-kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex; flex-direction: column; gap: 4px;
+      min-width: 0;
+    }
+    .dx-kpi-l {
+      font-size: 11.5px; font-weight: 500;
+      color: var(--text-mute);
+      letter-spacing: 0.02em;
+    }
+    .dx-kpi-v {
+      font-family: 'Outfit', sans-serif; font-weight: 600;
+      font-size: 22px; letter-spacing: -0.015em;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+    .dx-kpi-row { display: flex; align-items: baseline; gap: 6px; }
+    .dx-kpi-sub { font-size: 11px; color: var(--text-mute); }
+    .dx-kpi-spark {
+      margin-top: 6px; height: 32px;
+    }
+    .dx-kpi-foot {
+      font-size: 11px; color: var(--text-mute);
+      margin-top: 2px;
+    }
+
+    /* Grids */
+    .dx-grid-2 {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .dx-grid-3 {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    /* Card */
+    .dx-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex; flex-direction: column;
+      min-width: 0;
+    }
+    .dx-card.dense .dx-card-h { padding: 10px 14px; }
+    .dx-card.dense .dx-card-b { padding: 0 14px 14px; }
+    .dx-card-h {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 14px 16px; gap: 12px;
+      border-bottom: 1px solid var(--border-2);
+    }
+    .dx-card-t {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px; font-weight: 600; color: var(--text);
+    }
+    .dx-card-s {
+      font-size: 11.5px; color: var(--text-mute);
+      margin-top: 2px;
+    }
+    .dx-card-act { display: flex; gap: 6px; align-items: center; }
+    .dx-card-b { padding: 16px; }
+
+    /* Table */
+    .dx-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    .dx-table th {
+      text-align: left; font-weight: 500;
+      color: var(--text-mute); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dx-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border-2);
+      color: var(--text-dim);
+    }
+    .dx-table tbody tr:last-child td { border-bottom: none; }
+    .dx-table.compact td, .dx-table.compact th { padding: 6px 8px; }
+    .dx-row-clickable { cursor: pointer; transition: background 0.12s; }
+    .dx-row-clickable:hover { background: rgba(255,255,255,0.025); }
+    .dx-cell-app {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .dx-cell-name { font-weight: 500; color: var(--text); }
+    .dx-cell-cat { font-size: 11px; color: var(--text-mute); }
+    .dx-monet { font-size: 12px; color: var(--text-dim); }
+
+    /* Meters */
+    .dx-meters { display: flex; flex-direction: column; gap: 14px; }
+    .dx-meter { display: flex; flex-direction: column; gap: 5px; }
+    .dx-meter-h {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--text-dim);
+    }
+    .dx-meter-b {
+      position: relative; height: 6px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 3px;
+    }
+    .dx-meter-fill {
+      position: absolute; top: 0; left: 0; height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .dx-meter-target {
+      position: absolute; top: -2px; height: 10px;
+      width: 1.5px;
+      background: rgba(255,255,255,0.4);
+    }
+    .dx-meter-f {
+      font-size: 11px; color: var(--text-mute);
+    }
+    .dx-legend {
+      display: flex; gap: 14px;
+      margin-top: 10px;
+      font-size: 11.5px; color: var(--text-mute);
+    }
+    .dx-leg-d {
+      display: inline-block; width: 8px; height: 8px;
+      border-radius: 2px; vertical-align: middle;
+      margin-right: 5px;
+    }
+    .dx-leg-d.blue { background: oklch(0.72 0.14 240); }
+    .dx-leg-d.gray { background: rgba(230,232,239,0.18); }
+
+    /* Reviews */
+    .dx-reviews {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .dx-review {
+      display: flex; gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-2);
+    }
+    .dx-review:last-child { border-bottom: none; }
+    .dx-review.sent-pos { border-left: 2px solid var(--good); padding-left: 12px; margin-left: -14px; }
+    .dx-review.sent-neg { border-left: 2px solid var(--bad);  padding-left: 12px; margin-left: -14px; }
+    .dx-review.sent-neu { border-left: 2px solid var(--text-mute); padding-left: 12px; margin-left: -14px; }
+    .dx-review-body { flex: 1; min-width: 0; }
+    .dx-review-head {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; margin-bottom: 4px;
+    }
+    .dx-review-name { font-weight: 500; color: var(--text); }
+    .dx-review-stars { display: inline-flex; gap: 1px; }
+    .dx-review-when { color: var(--text-mute); font-size: 11px; margin-left: auto; }
+    .dx-review-text { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+
+    /* Anomaly feed */
+    .dx-anom-feed { list-style: none; display: flex; flex-direction: column; }
+    .dx-anom-item {
+      display: grid;
+      grid-template-columns: auto auto 1fr auto;
+      gap: 14px; align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid var(--border-2);
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .dx-anom-item:last-child { border-bottom: none; }
+    .dx-anom-item:hover { background: rgba(255,255,255,0.02); }
+    .dx-anom-icon {
+      width: 30px; height: 30px;
+      display: grid; place-items: center;
+      border-radius: 8px;
+      background: oklch(0.7 0.16 25 / 0.12);
+      color: var(--bad);
+    }
+    .dx-sev-med .dx-anom-icon { background: oklch(0.78 0.14 75 / 0.12); color: var(--warn); }
+    .dx-sev-good .dx-anom-icon { background: oklch(0.74 0.14 150 / 0.12); color: var(--good); }
+    .dx-anom-meta { min-width: 0; }
+    .dx-anom-title { font-size: 13px; font-weight: 500; color: var(--text); }
+    .dx-anom-detail { font-size: 12px; color: var(--text-dim); margin-top: 2px; line-height: 1.45; }
+    .dx-anom-side { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+
+    /* Stat row */
+    .dx-stat-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .dx-stat-row > div { display: flex; flex-direction: column; gap: 2px; }
+    .dx-stat-row b {
+      font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 600;
+      color: var(--text); font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+    }
+    .dx-stat-row.big b { font-size: 26px; }
+    .dx-stat-row span { font-size: 11px; color: var(--text-mute); letter-spacing: 0.02em; }
+
+    /* Sync */
+    .dx-sync { list-style: none; display: flex; flex-direction: column; }
+    .dx-sync-i {
+      display: grid; grid-template-columns: auto 1fr auto auto;
+      gap: 14px; align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-2);
+    }
+    .dx-sync-i:last-child { border-bottom: none; }
+    .dx-sync-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--good);
+      box-shadow: 0 0 8px var(--good);
+    }
+    .dx-sync-dot.st-error { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
+    .dx-sync-name { font-size: 13px; font-weight: 500; color: var(--text); }
+    .dx-sync-d { font-size: 11.5px; color: var(--text-mute); margin-top: 1px; }
+    .dx-sync-time { font-size: 11.5px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+    .dx-sync-i.st-error .dx-sync-time { color: var(--bad); }
+
+    /* Inline bar */
+    .dx-inline-bar {
+      position: relative; height: 5px;
+      background: rgba(255,255,255,0.04); border-radius: 3px;
+      overflow: hidden;
+    }
+    .dx-inline-bar > div {
+      position: absolute; left: 0; top: 0; height: 100%;
+      border-radius: 3px;
+    }
+    .dx-flag { font-size: 14px; margin-right: 4px; }
+
+    /* Drilldown drawer */
+    .dx-drawer-bg {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      animation: dxFade 0.2s ease;
+    }
+    @keyframes dxFade { from { opacity: 0; } to { opacity: 1; } }
+    .dx-drawer {
+      position: fixed; right: 0; top: 0; bottom: 0;
+      width: min(560px, 92vw);
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      animation: dxSlide 0.25s ease;
+      box-shadow: -16px 0 40px rgba(0,0,0,0.4);
+    }
+    @keyframes dxSlide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .dx-drawer-h {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .dx-drawer-t {
+      font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 18px;
+    }
+    .dx-drawer-s {
+      font-size: 12px; color: var(--text-mute); margin-top: 2px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .dx-drawer-body {
+      padding: 16px 20px;
+      overflow-y: auto; flex: 1;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .dx-drawer-actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      padding-top: 8px;
+    }
+
+    @media (max-width: 1100px) {
+      .dx-kpis { grid-template-columns: repeat(2, 1fr); }
+      .dx-grid-3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 820px) {
+      .dx-root { grid-template-columns: 1fr; }
+      .dx-side { display: none; }
+      .dx-grid-2 { grid-template-columns: 1fr; }
+      .dx-kpis { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- ── data.jsx ──────────────────────────────────────────────── -->
+  <script type="text/babel" data-presets="env,react">
+const APPS = [
+  { id: 'raiders', name: 'Raiders Companion', tag: 'GAME', cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.62 0.16 25)', glyph: 'R', desc: 'Strategy & loadout planner for Raiders.', rev30: 1842, inst30: 18420, dau: 3210, rating: 4.5, crash: 0.42 },
+  { id: 'chordpro', name: 'Chord Finder Pro', tag: 'MUSIC', cat: 'Music utility', platforms: ['android'], monet: 'Paid', color: 'oklch(0.68 0.14 200)', glyph: 'C+', desc: 'Reverse chord lookup & voicings for guitarists.', rev30: 962, inst30: 1240, dau: 880, rating: 4.7, crash: 0.18 },
+  { id: 'chord2', name: 'Chord Finder 2', tag: 'MUSIC', cat: 'Music utility', platforms: ['android','ios'], monet: 'Free + IAP', color: 'oklch(0.7 0.13 220)', glyph: 'C2', desc: 'Next-gen chord library with progressions & ear training.', rev30: 2104, inst30: 8600, dau: 2410, rating: 4.6, crash: 0.31 },
+  { id: 'tuner', name: 'Guitar Tuner', tag: 'MUSIC', cat: 'Music utility', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.72 0.13 160)', glyph: 'GT', desc: 'Pitch-perfect tuner with alt tunings.', rev30: 686, inst30: 22100, dau: 4900, rating: 4.4, crash: 0.55 },
+  { id: 'strat', name: 'Stratagems', tag: 'GAME', cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.74 0.14 75)', glyph: 'St', desc: 'Stratagem trainer & loadout reference.', rev30: 3420, inst30: 41200, dau: 9800, rating: 4.6, crash: 0.38 },
+  { id: 'stratwf', name: 'Stratagems Watch Face', tag: 'WEAR', cat: 'Wear OS', platforms: ['android'], monet: 'Paid', color: 'oklch(0.76 0.12 80)', glyph: 'SW', desc: 'On-wrist stratagem deck for Wear OS.', rev30: 412, inst30: 380, dau: 220, rating: 4.8, crash: 0.05 },
+  { id: 'stardew', name: 'Stardew Valley Map', tag: 'MAP', cat: 'Game map', platforms: ['android'], monet: 'Free + ads', color: 'oklch(0.74 0.13 130)', glyph: 'SV', desc: 'Interactive farm & town map.', rev30: 1270, inst30: 14600, dau: 2200, rating: 4.5, crash: 0.62 },
+  { id: 'zelda', name: 'Zelda BotW Map', tag: 'MAP', cat: 'Game map', platforms: ['android','ios'], monet: 'Free + IAP', color: 'oklch(0.72 0.14 145)', glyph: 'Z', desc: 'Korok seeds, shrines, quests, treasure.', rev30: 4830, inst30: 26500, dau: 7200, rating: 4.7, crash: 0.28 },
+  { id: 'windrose', name: 'Windrose Companion', tag: 'GAME', cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.7 0.13 250)', glyph: 'Wr', desc: 'Field guide & build planner.', rev30: 540, inst30: 3200, dau: 610, rating: 4.3, crash: 0.71 },
+  { id: 'crimson', name: 'Crimson Desert Map', tag: 'MAP', cat: 'Game map', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.66 0.16 30)', glyph: 'CD', desc: 'World map, lore nodes, fast-travel.', rev30: 980, inst30: 7300, dau: 1510, rating: 4.4, crash: 0.49 },
+  { id: 'gzw', name: 'GZW Companion', tag: 'GAME', cat: 'Game companion', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.62 0.13 30)', glyph: 'GZ', desc: 'Gray Zone Warfare ops & loot tracker.', rev30: 1640, inst30: 11200, dau: 2800, rating: 4.5, crash: 0.44 },
+  { id: 'wwm', name: 'Where Winds Meet', tag: 'MAP', cat: 'Game map', platforms: ['android','ios'], monet: 'Free + ads', color: 'oklch(0.7 0.12 200)', glyph: 'WM', desc: 'Open-world atlas & quest tracker.', rev30: 1120, inst30: 9400, dau: 1960, rating: 4.4, crash: 0.36 },
+];
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function genSeries(days, baseDaily, growth=0.0, vol=0.18, seed=1){
+  const rng=mulberry32(seed); const out=[];
+  for(let i=0;i<days;i++){
+    const trend = baseDaily * (1 + growth*(i/days));
+    const wk = 1 + 0.08*Math.sin((i/7)*2*Math.PI - 0.6);
+    const noise = 1 + (rng()*2-1)*vol;
+    out.push(Math.max(0, trend*wk*noise));
+  }
+  return out;
+}
+
+const HORIZON = 90;
+APPS.forEach((a, i) => {
+  const dailyRev = a.rev30 / 30;
+  const dailyInst = a.inst30 / 30;
+  a.series = {
+    revenue:  genSeries(HORIZON, dailyRev,  0.06, 0.22, 100+i),
+    admob:    genSeries(HORIZON, dailyRev*0.62, 0.05, 0.24, 200+i),
+    play:     genSeries(HORIZON, dailyRev*0.38, 0.04, 0.30, 300+i),
+    installs: genSeries(HORIZON, dailyInst, 0.03, 0.18, 400+i),
+    impr:     genSeries(HORIZON, dailyInst*1.8, 0.02, 0.16, 500+i),
+    ecpm:     genSeries(HORIZON, 6 + (i%5)*0.4, 0.01, 0.06, 600+i),
+    crashRate:genSeries(HORIZON, a.crash, -0.02, 0.20, 700+i),
+    anrRate:  genSeries(HORIZON, a.crash*0.4, 0.0, 0.22, 800+i),
+    refunds:  genSeries(HORIZON, dailyRev*0.02, 0.0, 0.5, 900+i),
+  };
+});
+const gzw = APPS.find(a=>a.id==='gzw');
+[7,8,9].forEach(d=>{ gzw.series.crashRate[HORIZON-d] *= 3.6; });
+const sv = APPS.find(a=>a.id==='stardew');
+[3,4,5].forEach(d=>{ sv.series.revenue[HORIZON-d] *= 0.42; sv.series.admob[HORIZON-d] *= 0.42; });
+
+const COUNTRIES = [
+  { c: 'United States', flag: '🇺🇸', rev: 6840, users: 38400, share: 0.32 },
+  { c: 'Germany',       flag: '🇩🇪', rev: 2310, users: 12100, share: 0.11 },
+  { c: 'United Kingdom',flag: '🇬🇧', rev: 1980, users: 11400, share: 0.09 },
+  { c: 'Sweden',        flag: '🇸🇪', rev: 1620, users:  6200, share: 0.075},
+  { c: 'France',        flag: '🇫🇷', rev: 1280, users:  9300, share: 0.06 },
+  { c: 'Canada',        flag: '🇨🇦', rev: 1140, users:  7800, share: 0.053},
+  { c: 'Australia',     flag: '🇦🇺', rev:  920, users:  5400, share: 0.043},
+  { c: 'Netherlands',   flag: '🇳🇱', rev:  710, users:  4100, share: 0.033},
+  { c: 'Japan',         flag: '🇯🇵', rev:  640, users:  6800, share: 0.030},
+  { c: 'Brazil',        flag: '🇧🇷', rev:  410, users: 12200, share: 0.019},
+];
+
+const AD_UNITS = [
+  { id:'au_1', app:'strat',   name:'Stratagems · Banner home',     fmt:'Banner',       imp: 412800, ecpm: 4.20, earn: 1734 },
+  { id:'au_2', app:'zelda',   name:'Zelda Map · Inter loaded',     fmt:'Interstitial', imp:  86200, ecpm:18.40, earn: 1586 },
+  { id:'au_3', app:'strat',   name:'Stratagems · Native list',     fmt:'Native',       imp: 211400, ecpm: 5.10, earn: 1078 },
+  { id:'au_4', app:'tuner',   name:'Tuner · Inter on session',     fmt:'Interstitial', imp:  72600, ecpm:12.80, earn:  929 },
+  { id:'au_5', app:'gzw',     name:'GZW · Rewarded loadout',       fmt:'Rewarded',     imp:  41800, ecpm:21.10, earn:  882 },
+  { id:'au_6', app:'stardew', name:'Stardew Map · Banner',         fmt:'Banner',       imp: 192300, ecpm: 3.80, earn:  730 },
+  { id:'au_7', app:'crimson', name:'Crimson · Inter map open',     fmt:'Interstitial', imp:  48100, ecpm:14.20, earn:  683 },
+  { id:'au_8', app:'wwm',     name:'WWM · Native quest cards',     fmt:'Native',       imp:  92400, ecpm: 6.20, earn:  573 },
+  { id:'au_9', app:'raiders', name:'Raiders · Banner home',        fmt:'Banner',       imp: 138200, ecpm: 3.40, earn:  470 },
+  { id:'au_10',app:'windrose',name:'Windrose · Inter session',     fmt:'Interstitial', imp:  21400, ecpm:16.00, earn:  342 },
+];
+
+const REVIEWS = [
+  { app:'zelda',   stars:5, who:'A. Lindberg',  when:'2h',  body:"Better than the official map. Korok tracking is chef's kiss.", sent:'pos' },
+  { app:'gzw',     stars:1, who:'Joonas K.',     when:'4h',  body:'Crashes every time I open the loot tracker after the new patch.', sent:'neg' },
+  { app:'strat',   stars:5, who:'Marco V.',      when:'6h',  body:'Saved my squad. Stratagem reaction times are noticeably faster.', sent:'pos' },
+  { app:'tuner',   stars:4, who:'Imani O.',      when:'9h',  body:'Accurate. Wish drop-D was a one-tap preset, but otherwise solid.', sent:'neu' },
+  { app:'chord2',  stars:5, who:'Hana T.',       when:'12h', body:'Progression generator is unreasonably good.', sent:'pos' },
+  { app:'stardew', stars:2, who:'P. Ohlsson',    when:'14h', body:"Map didn't load this morning. Empty state shown for 5 minutes.", sent:'neg' },
+  { app:'raiders', stars:4, who:'D. Mukherjee',  when:'1d',  body:'Loadout planner is great. Add export to image please.', sent:'neu' },
+  { app:'crimson', stars:5, who:'Solveig N.',    when:'1d',  body:'Lore nodes are a beautiful touch. Worth keeping installed.', sent:'pos' },
+];
+
+const ANOMALIES = [
+  { kind:'crash',  app:'gzw',     title:'Crash rate up 240% in last 72h',   detail:'Likely tied to v2.4.1 (rolled out Apr 22). Top stack: NullPointerException in LootTracker$Sync.', when:'3h ago', sev:'high' },
+  { kind:'rev',    app:'stardew', title:'Revenue dropped 58% over 3 days',  detail:'AdMob fill rate normal. Investigate impressions per session — check ad-cap config.', when:'1d ago', sev:'med' },
+  { kind:'rating', app:'tuner',   title:'Rating trend slipping toward 4.3', detail:'12 new 1-2★ reviews this week mention latency on Pixel 8a.', when:'2d ago', sev:'med' },
+  { kind:'good',   app:'strat',   title:'Installs +34% week-over-week',     detail:'Featured in r/Helldivers thread; organic traffic spike from US/DE/SE.', when:'1d ago', sev:'good' },
+];
+
+const SYNC_SOURCES = [
+  { name:'Google Play Developer API', last:'4 min ago',  status:'ok',    desc:'12 apps · sales, installs, ratings, crashes, ANRs' },
+  { name:'AdMob Reporting v1',        last:'11 min ago', status:'ok',    desc:'Earnings, impressions, eCPM, match rate, ad units' },
+  { name:'Play Console Reports (GCS)',last:'34 min ago', status:'ok',    desc:'Bulk export · 30-day rolling · refunds & subs' },
+  { name:'App Store Connect',         last:'failed',     status:'error', desc:'Token expired Apr 27 · re-auth required' },
+];
+
+window.XZ = { APPS, COUNTRIES, AD_UNITS, REVIEWS, ANOMALIES, SYNC_SOURCES, HORIZON };
+  </script>
+
+  <!-- ── ui.jsx ────────────────────────────────────────────────── -->
+  <script type="text/babel" data-presets="env,react">
+const ICONS = {
+  search: 'M11 4a7 7 0 1 0 4.39 12.45l3.58 3.58 1.41-1.41-3.58-3.58A7 7 0 0 0 11 4Zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z',
+  check: 'M9.55 17.6 4.4 12.45l1.4-1.4 3.75 3.75 8.65-8.65 1.4 1.4Z',
+  arrowUp: 'M12 5l6 6h-4v8h-4v-8H6Z',
+  arrowDn: 'M12 19l-6-6h4V5h4v8h4Z',
+  external: 'M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14Zm-2 4H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7h-2v7H5V9h7Z',
+  close: 'M18.3 5.71 12 12l6.3 6.29-1.42 1.42L10.59 13.4 4.3 19.71 2.88 18.29 9.17 12 2.88 5.71 4.3 4.3l6.29 6.29 6.29-6.3Z',
+  chevR: 'M9 6l6 6-6 6V6Z',
+  chevD: 'M6 9l6 6 6-6H6Z',
+  download: 'M5 20h14v-2H5Zm7-2 5-5h-3V4h-4v9H7Z',
+  refresh: 'M12 4V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-8Z',
+  filter: 'M3 5h18l-7 9v6l-4-2v-4Z',
+  warning: 'M12 2 1 21h22Zm0 6 7.5 13h-15Zm-1 5h2v4h-2zm0 5h2v2h-2z',
+  spark: 'M11 2 8 10H2l5 4-2 8 7-5 7 5-2-8 5-4h-6Z',
+  bolt: 'M11 21h-1l1-7H7.5L13 3h1l-1 7h3.5Z',
+  user: 'M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.3 0-10 1.65-10 5v3h20v-3c0-3.35-6.7-5-10-5Z',
+  google: 'M21.35 11.1H12v3.86h5.36c-.5 2.4-2.51 3.78-5.36 3.78a6 6 0 1 1 0-12 5.5 5.5 0 0 1 3.84 1.5l2.78-2.78A9.4 9.4 0 0 0 12 3a9 9 0 1 0 0 18c5.18 0 8.6-3.65 8.6-8.78 0-.59-.06-1.05-.25-1.12Z',
+  apple: 'M16.36 13.31c-.02-2.65 2.16-3.93 2.26-3.99a4.86 4.86 0 0 0-3.83-2.07c-1.62-.16-3.18.95-4 .95s-2.1-.93-3.46-.9a5.1 5.1 0 0 0-4.3 2.62c-1.86 3.21-.47 7.94 1.31 10.55.88 1.28 1.92 2.71 3.27 2.66 1.31-.05 1.81-.85 3.4-.85s2.04.85 3.42.83c1.41-.03 2.31-1.3 3.16-2.59a10.45 10.45 0 0 0 1.43-2.95 4.42 4.42 0 0 1-2.66-4.26ZM13.84 5.55a4.4 4.4 0 0 0 1-3.18 4.45 4.45 0 0 0-2.91 1.5 4.16 4.16 0 0 0-1.04 3.06 3.7 3.7 0 0 0 2.95-1.38Z',
+  shield: 'M12 2 4 5v6c0 5 3.6 9.7 8 11 4.4-1.3 8-6 8-11V5Z',
+  bell: 'M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Zm6-6V11c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1Z',
+  settings: 'M19.4 13a8 8 0 0 0 0-2l2-1.6-2-3.4-2.4 1a8 8 0 0 0-1.7-1l-.4-2.6h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a8 8 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4ZM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5Z',
+  list: 'M3 5h2v2H3Zm4 0h14v2H7Zm-4 6h2v2H3Zm4 0h14v2H7Zm-4 6h2v2H3Zm4 0h14v2H7Z',
+  grid: 'M3 3h8v8H3Zm10 0h8v8h-8ZM3 13h8v8H3Zm10 0h8v8h-8Z',
+  dollar: 'M12 2v3.04c-2.34.32-4 1.78-4 3.96 0 2.5 2.07 3.5 4 4 2 .5 3 1 3 2s-1 1.5-2.5 1.5S10 15.5 10 14H7c0 2.34 1.66 3.83 4 4.16V21h2v-2.84c2.34-.33 4-1.82 4-4.16 0-2.65-2.07-3.5-4-4-1.93-.5-3-1-3-2s.83-1.5 2.5-1.5S15 7 15 8.5h3c0-2.18-1.66-3.64-4-3.96V2Z',
+  clock: 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 11h-5v-2h3V6h2Z',
+  apps: 'M3 3h6v6H3Zm12 0h6v6h-6Zm-6 6h6v6H9ZM3 15h6v6H3Zm12 0h6v6h-6Z',
+  chart: 'M3 21V3h2v18Zm4 0v-7h3v7Zm6 0v-12h3v12Zm6 0v-9h2v9Z',
+  link: 'M10.6 13.4a3 3 0 0 0 4.2 0l3-3a3 3 0 0 0-4.2-4.2l-1 1 1.4 1.4 1-1a1 1 0 0 1 1.4 1.4l-3 3a1 1 0 0 1-1.4 0Zm2.8-2.8a3 3 0 0 0-4.2 0l-3 3a3 3 0 0 0 4.2 4.2l1-1-1.4-1.4-1 1a1 1 0 0 1-1.4-1.4l3-3a1 1 0 0 1 1.4 0Z',
+  flag: 'M5 21V3h12l-2 4 2 4H7v10Z',
+  star: 'm12 2 3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14 2 9.27l6.91-1Z',
+  moreH: 'M6 12a2 2 0 1 1-2-2 2 2 0 0 1 2 2Zm6-2a2 2 0 1 0 2 2 2 2 0 0 0-2-2Zm8 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2Z',
+  sparkles: 'M11 2 9 7 4 9l5 2 2 5 2-5 5-2-5-2Zm8 11-1 3-3 1 3 1 1 3 1-3 3-1-3-1Z',
+  mobile: 'M7 1h10a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2Zm5 19a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 12 20Zm5-3V4H7v13Z',
+  watch: 'M16 6V2H8v4l-2 6 2 6v4h8v-4l2-6Zm-4 12a6 6 0 1 1 6-6 6 6 0 0 1-6 6Z',
+};
+
+function Icon({ name, size=16, color='currentColor', style }){
+  const d = ICONS[name];
+  if(!d) return null;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"
+         style={{flex:'0 0 auto', display:'block', ...style}}>
+      <path d={d} fill={color}/>
+    </svg>
+  );
+}
+
+function AppIcon({ app, size=40, radius }){
+  const r = radius != null ? radius : Math.round(size*0.24);
+  const seed = (app.id.charCodeAt(0) + app.id.charCodeAt(app.id.length-1));
+  return (
+    <div style={{
+      width:size, height:size, borderRadius:r, position:'relative', overflow:'hidden',
+      background:`linear-gradient(135deg, ${app.color}, oklch(from ${app.color} calc(l*0.7) calc(c*0.9) h))`,
+      boxShadow:'inset 0 0 0 0.5px rgba(255,255,255,0.16), 0 1px 2px rgba(0,0,0,0.4)',
+      flex:'0 0 auto',
+    }}>
+      <svg viewBox="0 0 40 40" width={size} height={size} style={{position:'absolute', inset:0, opacity:0.55}}>
+        <circle cx={6+seed%10} cy={6+seed%7} r="14" fill="rgba(255,255,255,0.12)"/>
+        <circle cx={34-seed%6} cy={32-seed%5} r="9" fill="rgba(0,0,0,0.18)"/>
+      </svg>
+      <div style={{
+        position:'absolute', inset:0, display:'grid', placeItems:'center',
+        color:'rgba(255,255,255,0.95)', fontFamily:'Outfit, sans-serif', fontWeight:600,
+        fontSize: size*0.36, letterSpacing:'-0.02em', textShadow:'0 1px 1px rgba(0,0,0,0.25)',
+      }}>{app.glyph}</div>
+    </div>
+  );
+}
+
+function PlatformBadges({ platforms, size=12, gap=4 }){
+  return (
+    <span style={{display:'inline-flex', gap, alignItems:'center', color:'rgba(230,232,239,0.55)'}}>
+      {platforms.includes('android') && <Icon name="mobile" size={size}/>}
+      {platforms.includes('ios') && <Icon name="apple" size={size}/>}
+    </span>
+  );
+}
+
+function Tag({ children, color, style }){
+  return (
+    <span style={{
+      display:'inline-flex', alignItems:'center', gap:4, padding:'2px 7px',
+      fontSize:10.5, lineHeight:1.4, letterSpacing:'.04em', textTransform:'uppercase',
+      borderRadius:4, fontWeight:500,
+      background: color ? `oklch(from ${color} l c h / 0.14)` : 'rgba(255,255,255,0.06)',
+      color: color || 'rgba(230,232,239,0.7)',
+      border: `1px solid ${color ? `oklch(from ${color} l c h / 0.2)` : 'rgba(255,255,255,0.08)'}`,
+      ...style,
+    }}>{children}</span>
+  );
+}
+
+function Delta({ value, format, inverse=false }){
+  const fmt = format || window.fmtMoney;
+  const up = value > 0;
+  const good = inverse ? !up : up;
+  const color = value === 0 ? 'rgba(230,232,239,0.45)' : (good ? 'oklch(0.74 0.14 150)' : 'oklch(0.7 0.16 25)');
+  return (
+    <span style={{display:'inline-flex', alignItems:'center', gap:2, color, fontVariantNumeric:'tabular-nums', fontSize:11.5, fontWeight:500}}>
+      <Icon name={up?'arrowUp':'arrowDn'} size={11} color={color}/>
+      {fmt(Math.abs(value))}
+    </span>
+  );
+}
+
+Object.assign(window, { Icon, AppIcon, PlatformBadges, Tag, Delta, ICONS });
+  </script>
+
+  <!-- ── charts.jsx ────────────────────────────────────────────── -->
+  <script type="text/babel" data-presets="env,react">
+const C = {
+  blue:    'oklch(0.72 0.14 240)',
+  blueDim: 'oklch(0.72 0.14 240 / 0.18)',
+  blueGhost:'oklch(0.72 0.14 240 / 0.06)',
+  green:   'oklch(0.74 0.14 150)',
+  amber:   'oklch(0.78 0.14 75)',
+  red:     'oklch(0.68 0.18 25)',
+  violet:  'oklch(0.7 0.14 290)',
+  ink:     '#e6e8ef',
+  inkDim:  'rgba(230,232,239,0.55)',
+  inkMute: 'rgba(230,232,239,0.32)',
+  line:    'rgba(255,255,255,0.06)',
+  lineSoft:'rgba(255,255,255,0.04)',
+};
+
+const palette = [C.blue, C.green, C.amber, C.violet, C.red,
+  'oklch(0.74 0.13 200)','oklch(0.72 0.13 130)','oklch(0.7 0.13 320)',
+  'oklch(0.78 0.12 60)','oklch(0.66 0.13 250)','oklch(0.7 0.13 100)','oklch(0.72 0.13 350)'];
+
+function fmtMoney(n){
+  if(n==null||isNaN(n)) return '$0';
+  if(Math.abs(n)>=1e6) return '$'+(n/1e6).toFixed(2)+'M';
+  if(Math.abs(n)>=1e3) return '$'+(n/1e3).toFixed(1)+'k';
+  return '$'+n.toFixed(0);
+}
+function fmtNum(n){
+  if(n==null||isNaN(n)) return '0';
+  if(Math.abs(n)>=1e6) return (n/1e6).toFixed(2)+'M';
+  if(Math.abs(n)>=1e3) return (n/1e3).toFixed(1)+'k';
+  return n.toFixed(0);
+}
+function fmtPct(n,d=2){ return (n*100).toFixed(d)+'%'; }
+
+function pathFromSeries(values, w, h, padTop=4, padBot=2){
+  if(!values.length) return '';
+  const max = Math.max(...values, 1e-9);
+  const min = 0;
+  const range = max - min || 1;
+  const stepX = w / Math.max(1, values.length-1);
+  return values.map((v,i)=>{
+    const x = i*stepX;
+    const y = padTop + (h - padTop - padBot) * (1 - (v-min)/range);
+    return (i===0 ? 'M' : 'L') + x.toFixed(2) + ',' + y.toFixed(2);
+  }).join(' ');
+}
+
+function areaFromSeries(values, w, h, padTop=4, padBot=2){
+  if(!values.length) return '';
+  const line = pathFromSeries(values, w, h, padTop, padBot);
+  return line + ` L${w.toFixed(2)},${(h-padBot).toFixed(2)} L0,${(h-padBot).toFixed(2)} Z`;
+}
+
+function LineChart({ series, comparison, height=180, formatter, gridY=4 }){
+  const fmt = formatter || fmtNum;
+  const W = 100, H = height;
+  const ref = React.useRef(null);
+  const [hover, setHover] = React.useState(null);
+  const all = [...series, ...(comparison||[])];
+  const len = series[0]?.values.length || 1;
+
+  const onMove = (e)=>{
+    const r = ref.current.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const i = Math.round((x/r.width) * (len-1));
+    setHover({ i: Math.max(0, Math.min(len-1, i)) });
+  };
+  const onLeave = ()=>setHover(null);
+
+  return (
+    <div ref={ref} style={{position:'relative', width:'100%', height:H}}
+         onMouseMove={onMove} onMouseLeave={onLeave}>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none"
+           style={{position:'absolute', inset:0, width:'100%', height:'100%', overflow:'visible'}}>
+        {Array.from({length:gridY+1}).map((_,i)=>{
+          const y = (H-2)*(i/gridY)+2;
+          return <line key={i} x1="0" x2={W} y1={y} y2={y} stroke={C.line} strokeWidth=".5" vectorEffect="non-scaling-stroke"/>;
+        })}
+        <defs>
+          {series.map((s,si)=>(
+            <linearGradient key={si} id={`grad-${si}-${s.label.replace(/\s/g,'')}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={s.color||C.blue} stopOpacity="0.28"/>
+              <stop offset="100%" stopColor={s.color||C.blue} stopOpacity="0"/>
+            </linearGradient>
+          ))}
+        </defs>
+        {(comparison||[]).map((s,i)=>(
+          <path key={'c'+i} d={pathFromSeries(s.values, W, H)}
+                stroke={C.inkMute} strokeDasharray="2 2" strokeWidth="1" fill="none"
+                vectorEffect="non-scaling-stroke" />
+        ))}
+        {series.map((s,si)=>(
+          <g key={si}>
+            <path d={areaFromSeries(s.values, W, H)} fill={`url(#grad-${si}-${s.label.replace(/\s/g,'')})`}/>
+            <path d={pathFromSeries(s.values, W, H)} stroke={s.color||C.blue} strokeWidth="1.25" fill="none"
+                  strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke"/>
+          </g>
+        ))}
+        {hover && (
+          <line x1={(hover.i/(len-1))*W} x2={(hover.i/(len-1))*W} y1="0" y2={H}
+                stroke="rgba(255,255,255,0.18)" strokeWidth="1" vectorEffect="non-scaling-stroke"/>
+        )}
+        {hover && series.map((s,si)=>{
+          const v = s.values[hover.i];
+          const max = Math.max(...s.values, 1e-9);
+          const x = (hover.i/(len-1))*W;
+          const y = 4 + (H - 6) * (1 - v/max);
+          return <circle key={si} cx={x} cy={y} r="2.4" fill={s.color||C.blue} stroke="#0b0c10" strokeWidth=".8" vectorEffect="non-scaling-stroke"/>;
+        })}
+      </svg>
+      {hover && (
+        <div style={{
+          position:'absolute',
+          left: `min(calc(100% - 168px), max(0px, ${(hover.i/(len-1))*100}% - 80px))`,
+          top: 4,
+          background:'rgba(14,16,22,0.95)', border:'1px solid rgba(255,255,255,0.08)',
+          borderRadius:8, padding:'8px 10px', fontSize:11, lineHeight:1.45,
+          pointerEvents:'none', minWidth:160,
+          boxShadow:'0 8px 24px rgba(0,0,0,.4)',
+        }}>
+          <div style={{color:C.inkDim, fontSize:10, marginBottom:4, letterSpacing:'.04em', textTransform:'uppercase'}}>Day {hover.i+1}</div>
+          {series.map((s,si)=>(
+            <div key={si} style={{display:'flex', justifyContent:'space-between', gap:12, color:C.ink}}>
+              <span style={{display:'flex', alignItems:'center', gap:6}}>
+                <span style={{display:'inline-block', width:8, height:2, background:s.color||C.blue, borderRadius:1}}/>
+                {s.label}
+              </span>
+              <b style={{fontVariantNumeric:'tabular-nums', fontWeight:500}}>{fmt(s.values[hover.i])}</b>
+            </div>
+          ))}
+          {comparison && comparison.map((s,si)=>(
+            <div key={'c'+si} style={{display:'flex', justifyContent:'space-between', gap:12, color:C.inkDim}}>
+              <span>{s.label}</span>
+              <span style={{fontVariantNumeric:'tabular-nums'}}>{fmt(s.values[hover.i])}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BarChartH({ rows, max, formatter, accent=C.blue, height=180 }){
+  const fmt = formatter || fmtMoney;
+  const m = max || Math.max(...rows.map(r=>r.value), 1e-9);
+  return (
+    <div style={{display:'flex', flexDirection:'column', gap:6}}>
+      {rows.map((r,i)=>(
+        <div key={i} style={{display:'grid', gridTemplateColumns:'112px 1fr 64px', gap:10, alignItems:'center', fontSize:12}}>
+          <div style={{color:C.ink, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}} title={r.label}>{r.label}</div>
+          <div style={{position:'relative', height:8, background:'rgba(255,255,255,0.04)', borderRadius:2}}>
+            <div style={{
+              position:'absolute', inset:0, right:'auto',
+              width: (r.value/m*100)+'%',
+              background: r.color || accent,
+              borderRadius:2,
+              transition:'width .35s cubic-bezier(.3,.7,.4,1)'
+            }}/>
+          </div>
+          <div style={{textAlign:'right', color:C.inkDim, fontVariantNumeric:'tabular-nums'}}>{fmt(r.value)}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ColumnChart({ rows, height=140, formatter }){
+  const fmt = formatter || fmtNum;
+  const max = Math.max(...rows.flatMap(r=>[r.a, r.b||0]), 1e-9);
+  return (
+    <div style={{display:'flex', alignItems:'flex-end', gap:6, height, padding:'0 2px'}}>
+      {rows.map((r,i)=>(
+        <div key={i} style={{flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:4, height:'100%'}}>
+          <div style={{flex:1, width:'100%', display:'flex', alignItems:'flex-end', gap:2}}>
+            <div style={{flex:1, height:(r.a/max*100)+'%', background:C.blue, borderRadius:'2px 2px 0 0', minHeight:1, transition:'height .35s'}}/>
+            {r.b!=null && <div style={{flex:1, height:(r.b/max*100)+'%', background:'rgba(230,232,239,0.18)', borderRadius:'2px 2px 0 0', minHeight:1, transition:'height .35s'}}/>}
+          </div>
+          <div style={{fontSize:9.5, color:C.inkMute, letterSpacing:'.04em'}}>{r.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Sparkline({ values, color=C.blue, height=32, width=80, fill=true }){
+  const W=100, H=height;
+  const id = `sl-${color.replace(/[^a-z0-9]/gi,'')}-${Math.random().toString(36).slice(2,7)}`;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none"
+         style={{width: width || '100%', height, display:'block', overflow:'visible'}}>
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity=".3"/>
+          <stop offset="100%" stopColor={color} stopOpacity="0"/>
+        </linearGradient>
+      </defs>
+      {fill && <path d={areaFromSeries(values, W, H, 2, 2)} fill={`url(#${id})`}/>}
+      <path d={pathFromSeries(values, W, H, 2, 2)} stroke={color} strokeWidth="1.4" fill="none"
+            strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke"/>
+    </svg>
+  );
+}
+
+function Heatmap({ rows, cols, values, formatter }){
+  const fmt = formatter || fmtPct;
+  const max = Math.max(...values.flat().filter(v => v != null), 1e-9);
+  return (
+    <div style={{display:'grid', gridTemplateColumns:`80px repeat(${cols.length}, 1fr)`, gap:2, fontSize:10.5}}>
+      <div/>
+      {cols.map((c,i)=>(
+        <div key={i} style={{textAlign:'center', color:C.inkMute, padding:'2px 0', letterSpacing:'.04em'}}>{c}</div>
+      ))}
+      {rows.map((r,i)=>(
+        <React.Fragment key={i}>
+          <div style={{color:C.inkDim, padding:'4px 6px 4px 0', textAlign:'right', fontVariantNumeric:'tabular-nums'}}>{r}</div>
+          {cols.map((c,j)=>{
+            const v = values[i][j];
+            const t = v==null ? 0 : v/max;
+            return (
+              <div key={j} title={v==null?'—':fmt(v)} style={{
+                background: v==null ? 'transparent' : `oklch(0.72 ${0.06+0.10*t} 240 / ${0.08+0.55*t})`,
+                color: t>0.55 ? '#0b0c10' : C.ink,
+                borderRadius:3, padding:'5px 4px', textAlign:'center', fontVariantNumeric:'tabular-nums',
+                border: v==null ? '1px dashed rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.04)'
+              }}>{v==null?'—':fmt(v,0)}</div>
+            );
+          })}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+Object.assign(window, { LineChart, BarChartH, ColumnChart, Sparkline, Heatmap, fmtMoney, fmtNum, fmtPct, ChartC: C, palette, pathFromSeries, areaFromSeries });
+  </script>
+
+  <!-- ── login.jsx ─────────────────────────────────────────────── -->
+  <script type="text/babel" data-presets="env,react">
+function LoginScreen({ onSignIn, onBack }){
+  const [loading, setLoading] = React.useState(false);
+  const [email, setEmail] = React.useState('');
+  const handle = ()=>{
+    setLoading(true);
+    setTimeout(()=>onSignIn({ name:'Adam Eriksson', email: email||'adam@xerxz.app' }), 900);
+  };
+  return (
+    <div className="login-root">
+      <div className="login-aside">
+        <div className="login-mark">
+          <span className="ps-mark">X</span>
+          <span>Xerxz</span>
+          <span className="ps-logo-tag">Console</span>
+        </div>
+        <div className="login-aside-body">
+          <h1 className="login-h">A small studio's command center.</h1>
+          <p className="login-p">Live revenue, installs, ratings, ads, and crashes — synced from Play Console and AdMob, kept private behind your Google account.</p>
+          <ul className="login-checks">
+            <li><Icon name="check" size={14} color="oklch(0.74 0.14 150)"/> Owner-only access by allowlisted email</li>
+            <li><Icon name="check" size={14} color="oklch(0.74 0.14 150)"/> Credentials never touch the browser</li>
+            <li><Icon name="check" size={14} color="oklch(0.74 0.14 150)"/> Hourly sync · cached for fast loads</li>
+          </ul>
+        </div>
+        <div className="login-foot-aside">
+          <a href="#" onClick={(e)=>{e.preventDefault();onBack();}}>← Back to xerxz.app</a>
+        </div>
+      </div>
+      <div className="login-panel">
+        <div className="login-card">
+          <div className="login-eyebrow">Restricted area</div>
+          <h2 className="login-h2">Sign in to the dashboard</h2>
+          <p className="login-sub">Use the Google account associated with your developer profile.</p>
+          <button className="login-google" onClick={handle} disabled={loading}>
+            <Icon name="google" size={18} color="#0b0c10"/>
+            {loading ? 'Verifying allowlist…' : 'Continue with Google'}
+          </button>
+          <div className="login-or"><span>or use SSO</span></div>
+          <label className="login-field">
+            <span>Work email</span>
+            <input type="email" placeholder="you@xerxz.app" value={email} onChange={e=>setEmail(e.target.value)}/>
+          </label>
+          <button className="login-secondary" onClick={handle} disabled={loading}>Send magic link</button>
+          <div className="login-note">
+            <Icon name="shield" size={13} color="oklch(0.72 0.14 240)"/>
+            <span>Demo prototype. No real authentication — clicking either button signs you into a synthetic dashboard with sample data.</span>
+          </div>
+        </div>
+        <div className="login-foot">
+          <a href="#">Privacy</a><span>·</span>
+          <a href="#">Security</a><span>·</span>
+          <a href="#">Status</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { LoginScreen });
+  </script>
+
+  <!-- ── dashboard.jsx ─────────────────────────────────────────── -->
+  <script type="text/babel" data-presets="env,react">
+const DATE_RANGES = [
+  { id:'today', label:'Today', days:1 },
+  { id:'yest',  label:'Yesterday', days:1 },
+  { id:'7d',    label:'7d', days:7 },
+  { id:'30d',   label:'30d', days:30 },
+  { id:'mtd',   label:'Month', days:29 },
+  { id:'90d',   label:'90d', days:90 },
+];
+
+function sumRange(values, days){ return values.slice(-days).reduce((s,v)=>s+v, 0); }
+function sumRangePrev(values, days){ return values.slice(-days*2, -days).reduce((s,v)=>s+v, 0); }
+function avgRange(values, days){
+  const slice = values.slice(-days);
+  return slice.reduce((s,v)=>s+v,0)/Math.max(1,slice.length);
+}
+function aggregateApps(apps, key, days){
+  const out = new Array(days).fill(0);
+  apps.forEach(a=>{
+    const s = a.series[key].slice(-days);
+    s.forEach((v,i)=> out[i]+=v);
+  });
+  return out;
+}
+
+function Dashboard({ user, onSignOut, onBackToSite }){
+  const [range, setRange] = React.useState('30d');
+  const [appFilter, setAppFilter] = React.useState('all');
+  const [platform, setPlatform] = React.useState('all');
+  const [source, setSource] = React.useState('all');
+  const [tab, setTab] = React.useState('overview');
+  const [drilldown, setDrilldown] = React.useState(null);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [compare, setCompare] = React.useState(true);
+
+  const days = DATE_RANGES.find(r=>r.id===range)?.days || 30;
+
+  const apps = React.useMemo(()=>{
+    let list = window.XZ.APPS;
+    if(platform!=='all') list = list.filter(a=>a.platforms.includes(platform));
+    if(appFilter!=='all') list = list.filter(a=>a.id===appFilter);
+    return list;
+  },[platform, appFilter]);
+
+  const totalRev   = React.useMemo(()=> sumRange(aggregateApps(apps,'revenue',days), days), [apps,days]);
+  const totalRevP  = React.useMemo(()=> sumRangePrev(aggregateApps(apps,'revenue',days*2), days), [apps,days]);
+  const admob      = React.useMemo(()=> sumRange(aggregateApps(apps,'admob',days), days), [apps,days]);
+  const admobP     = React.useMemo(()=> sumRangePrev(aggregateApps(apps,'admob',days*2), days), [apps,days]);
+  const play       = React.useMemo(()=> sumRange(aggregateApps(apps,'play',days), days), [apps,days]);
+  const installs   = React.useMemo(()=> sumRange(aggregateApps(apps,'installs',days), days), [apps,days]);
+  const installsP  = React.useMemo(()=> sumRangePrev(aggregateApps(apps,'installs',days*2), days), [apps,days]);
+  const dau        = React.useMemo(()=> apps.reduce((s,a)=>s+a.dau,0), [apps]);
+  const ratingAvg  = React.useMemo(()=> apps.reduce((s,a)=>s+a.rating,0)/Math.max(1,apps.length), [apps]);
+  const crash      = React.useMemo(()=> avgRange(aggregateApps(apps,'crashRate',days).map(v=>v/Math.max(1,apps.length)), days), [apps,days]);
+  const impr       = React.useMemo(()=> sumRange(aggregateApps(apps,'impr',days), days), [apps,days]);
+  const ecpm       = React.useMemo(()=> admob / Math.max(1, impr) * 1000, [admob, impr]);
+
+  const revSeries  = aggregateApps(apps,'revenue',days);
+  const installsSeries = aggregateApps(apps,'installs',days);
+  const installsSeriesP= aggregateApps(apps,'installs',days*2).slice(0, days);
+
+  const onRefresh = ()=>{
+    setRefreshing(true);
+    setTimeout(()=>setRefreshing(false), 1100);
+  };
+
+  return (
+    <div className="dx-root">
+      <DxSidebar tab={tab} setTab={setTab} user={user} onSignOut={onSignOut} onBackToSite={onBackToSite}/>
+      <div className="dx-main">
+        <DxTopbar tab={tab}
+                  range={range} setRange={setRange}
+                  appFilter={appFilter} setAppFilter={setAppFilter}
+                  platform={platform} setPlatform={setPlatform}
+                  source={source} setSource={setSource}
+                  compare={compare} setCompare={setCompare}
+                  refreshing={refreshing} onRefresh={onRefresh}/>
+        <div className="dx-page">
+          {tab==='overview' && (
+            <Overview {...{apps, days, totalRev, totalRevP, admob, admobP, play, installs, installsP, dau, ratingAvg, crash, impr, ecpm, revSeries, installsSeries, installsSeriesP, compare, setDrilldown}}/>
+          )}
+          {tab==='apps' && <AppsTable apps={window.XZ.APPS} days={days} onSelect={setDrilldown}/>}
+          {tab==='ads' && <AdsView apps={apps} days={days}/>}
+          {tab==='reviews' && <ReviewsView/>}
+          {tab==='anomalies' && <AnomaliesView onSelect={setDrilldown}/>}
+          {tab==='cohort' && <CohortView/>}
+          {tab==='sync' && <SyncView/>}
+        </div>
+      </div>
+      {drilldown && <Drilldown app={window.XZ.APPS.find(a=>a.id===drilldown)} days={days} onClose={()=>setDrilldown(null)}/>}
+    </div>
+  );
+}
+
+function DxSidebar({ tab, setTab, user, onSignOut, onBackToSite }){
+  const items = [
+    { id:'overview',  icon:'chart',    label:'Overview' },
+    { id:'apps',      icon:'apps',     label:'Apps' },
+    { id:'ads',       icon:'dollar',   label:'Ad units' },
+    { id:'reviews',   icon:'star',     label:'Reviews' },
+    { id:'anomalies', icon:'warning',  label:'Anomalies', badge:3 },
+    { id:'cohort',    icon:'grid',     label:'Cohorts' },
+    { id:'sync',      icon:'refresh',  label:'Sync status', badge:'!' },
+  ];
+  return (
+    <aside className="dx-side">
+      <div className="dx-side-brand">
+        <span className="ps-mark sm">X</span>
+        <div>
+          <div className="dx-brand-t">Xerxz</div>
+          <div className="dx-brand-s">Console · v3.4</div>
+        </div>
+      </div>
+      <nav className="dx-nav">
+        <div className="dx-nav-h">Workspace</div>
+        {items.map(it=>(
+          <button key={it.id} className={'dx-nav-i '+(tab===it.id?'on':'')} onClick={()=>setTab(it.id)}>
+            <Icon name={it.icon} size={15}/>
+            <span>{it.label}</span>
+            {it.badge && <span className={'dx-badge '+(it.badge==='!'?'warn':'')}>{it.badge}</span>}
+          </button>
+        ))}
+        <div className="dx-nav-h">Configuration</div>
+        <button className="dx-nav-i"><Icon name="settings" size={15}/><span>Connections</span></button>
+        <button className="dx-nav-i"><Icon name="user" size={15}/><span>Allowlist</span></button>
+        <button className="dx-nav-i" onClick={onBackToSite}><Icon name="external" size={15}/><span>Public site</span></button>
+      </nav>
+      <div className="dx-side-foot">
+        <div className="dx-user">
+          <div className="dx-avatar">{user.name.split(' ').map(n=>n[0]).join('')}</div>
+          <div className="dx-user-meta">
+            <div className="dx-user-n">{user.name}</div>
+            <div className="dx-user-e">{user.email}</div>
+          </div>
+          <button className="dx-icon-btn" onClick={onSignOut} title="Sign out"><Icon name="external" size={13}/></button>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function DxTopbar({ tab, range, setRange, appFilter, setAppFilter, platform, setPlatform, source, setSource, compare, setCompare, refreshing, onRefresh }){
+  const labels = { overview:'Overview', apps:'Apps', ads:'Ad units', reviews:'Reviews', anomalies:'Anomalies', cohort:'Cohorts', sync:'Sync status' };
+  return (
+    <div className="dx-top">
+      <div className="dx-top-l">
+        <div className="dx-crumb">
+          <span>Workspace</span>
+          <Icon name="chevR" size={12} color="rgba(230,232,239,0.3)"/>
+          <span className="dx-crumb-cur">{labels[tab]}</span>
+        </div>
+      </div>
+      <div className="dx-top-r">
+        <div className="dx-seg">
+          {DATE_RANGES.map(r=>(
+            <button key={r.id} className={range===r.id?'on':''} onClick={()=>setRange(r.id)}>{r.label}</button>
+          ))}
+        </div>
+        <select className="dx-select" value={appFilter} onChange={e=>setAppFilter(e.target.value)}>
+          <option value="all">All apps</option>
+          {window.XZ.APPS.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}
+        </select>
+        <select className="dx-select" value={platform} onChange={e=>setPlatform(e.target.value)}>
+          <option value="all">All platforms</option>
+          <option value="android">Android</option>
+          <option value="ios">iOS</option>
+        </select>
+        <button className={'dx-toggle '+(compare?'on':'')} onClick={()=>setCompare(!compare)}>
+          <Icon name="chart" size={13}/> Compare prev.
+        </button>
+        <button className="dx-btn-ghost" onClick={onRefresh}>
+          <Icon name="refresh" size={13} style={{animation: refreshing?'dx-spin .8s linear infinite':'none'}}/>
+          {refreshing ? 'Syncing…' : 'Refresh'}
+        </button>
+        <button className="dx-btn"><Icon name="download" size={13}/> Export CSV</button>
+      </div>
+    </div>
+  );
+}
+
+function Overview({ apps, days, totalRev, totalRevP, admob, admobP, play, installs, installsP, dau, ratingAvg, crash, impr, ecpm, revSeries, installsSeries, installsSeriesP, compare, setDrilldown }){
+  const kpis = [
+    { label:'Total revenue (est.)',    value: fmtMoney(totalRev),   delta:(totalRev-totalRevP)/Math.max(1,totalRevP), spark: revSeries, color:ChartC.blue, sub:`from ${apps.length} apps` },
+    { label:'AdMob earnings',          value: fmtMoney(admob),       delta:(admob-admobP)/Math.max(1,admobP),         spark: aggregateApps(apps,'admob',days), color:ChartC.green, sub:'ads · interstitial · native' },
+    { label:'Google Play (sales+IAP)', value: fmtMoney(play),        delta: 0.084,                                    spark: aggregateApps(apps,'play',days), color:ChartC.amber, sub:'paid + IAP + subs' },
+    { label:'Installs',                value: fmtNum(installs),      delta:(installs-installsP)/Math.max(1,installsP),spark: installsSeries, color:ChartC.violet, sub:`avg ${fmtNum(installs/days)}/day` },
+    { label:'Active devices (DAU)',    value: fmtNum(dau),           delta: 0.041,                                    spark: aggregateApps(apps,'installs',days).map(v=>v*0.18+dau*0.7), color:ChartC.blue, sub:'rolling 24h' },
+    { label:'Rating average',          value: ratingAvg.toFixed(2),  delta: 0.012,                                    spark: aggregateApps(apps,'installs',days).map((_,i)=>4.4+0.1*Math.sin(i/3)), color:ChartC.amber, sub:'weighted by installs' },
+    { label:'Crash rate',              value: crash.toFixed(2)+'%',  delta: -0.073, inverse:true,                      spark: aggregateApps(apps,'crashRate',days).map(v=>v/Math.max(1,apps.length)), color:ChartC.red, sub:'sessions · 24h' },
+    { label:'Ad impressions',          value: fmtNum(impr),          delta: 0.062,                                    spark: aggregateApps(apps,'impr',days), color:ChartC.green, sub:`eCPM $${ecpm.toFixed(2)}` },
+  ];
+
+  const rankedRev = window.XZ.APPS.map(a=>({ label:a.name, value:sumRange(a.series.revenue, days), color:a.color, app:a })).sort((a,b)=>b.value-a.value).slice(0,8);
+  const rankedInst = window.XZ.APPS.map(a=>({ label:a.name, value:sumRange(a.series.installs, days), color:a.color, app:a })).sort((a,b)=>b.value-a.value).slice(0,8);
+
+  return (
+    <>
+      <AnomalyBar/>
+      <div className="dx-kpis">
+        {kpis.map((k,i)=>(
+          <div key={i} className="dx-kpi">
+            <div className="dx-kpi-l">{k.label}</div>
+            <div className="dx-kpi-v">{k.value}</div>
+            <div className="dx-kpi-row">
+              <Delta value={k.delta} format={(v)=>fmtPct(v,1)} inverse={k.inverse}/>
+              <span className="dx-kpi-sub">vs prev.</span>
+            </div>
+            <div className="dx-kpi-spark"><Sparkline values={k.spark} color={k.color} height={28} width={null}/></div>
+            <div className="dx-kpi-foot">{k.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="dx-grid-2">
+        <Card title="Revenue over time" sub={`AdMob + Play · last ${days} days`} actions={<><Tag color={ChartC.blue}>AdMob</Tag><Tag color={ChartC.amber}>Play</Tag>{compare && <Tag>compare</Tag>}</>}>
+          <LineChart series={[
+            { label:'AdMob', values: aggregateApps(apps,'admob',days), color: ChartC.blue },
+            { label:'Play',  values: aggregateApps(apps,'play',days),  color: ChartC.amber },
+          ]} comparison={compare ? [{ label:'AdMob (prev)', values: aggregateApps(apps,'admob',days*2).slice(0,days) }] : null}
+            formatter={fmtMoney} height={200}/>
+        </Card>
+        <Card title="Installs over time" sub={`organic + paid · last ${days} days`} actions={<Tag color={ChartC.violet}>Installs</Tag>}>
+          <LineChart series={[{ label:'Installs', values: installsSeries, color: ChartC.violet }]}
+                     comparison={compare ? [{ label:'Prev', values: installsSeriesP }] : null}
+                     formatter={fmtNum} height={200}/>
+        </Card>
+      </div>
+
+      <div className="dx-grid-3">
+        <Card title="AdMob earnings by app" sub={`top 8 · last ${days} days`}>
+          <BarChartH rows={rankedRev.map(r=>({label:r.label, value:r.value*0.62, color:r.color}))} formatter={fmtMoney}/>
+        </Card>
+        <Card title="Ad impressions & eCPM" sub={`trend · last ${days} days`} actions={<><Tag color={ChartC.green}>Impr</Tag><Tag color={ChartC.blue}>eCPM</Tag></>}>
+          <LineChart series={[
+            { label:'Impressions', values: aggregateApps(apps,'impr',days), color: ChartC.green },
+            { label:'eCPM × 1000', values: aggregateApps(apps,'ecpm',days).map((v,i)=>v*1000), color: ChartC.blue },
+          ]} formatter={fmtNum} height={180}/>
+        </Card>
+        <Card title="Crash & ANR rate" sub={`% sessions · last ${days} days`} actions={<><Tag color={ChartC.red}>Crash</Tag><Tag color={ChartC.amber}>ANR</Tag></>}>
+          <LineChart series={[
+            { label:'Crash %', values: aggregateApps(apps,'crashRate',days).map(v=>v/Math.max(1,apps.length)), color: ChartC.red },
+            { label:'ANR %',   values: aggregateApps(apps,'anrRate',days).map(v=>v/Math.max(1,apps.length)), color: ChartC.amber },
+          ]} formatter={(v)=>v.toFixed(2)+'%'} height={180}/>
+        </Card>
+      </div>
+
+      <div className="dx-grid-2">
+        <Card title="Apps ranked by revenue" sub={`last ${days} days`} action={<button className="dx-link-btn">View all →</button>}>
+          <BarChartH rows={rankedRev} formatter={fmtMoney}/>
+        </Card>
+        <Card title="Apps ranked by installs" sub={`last ${days} days`} action={<button className="dx-link-btn">View all →</button>}>
+          <BarChartH rows={rankedInst} formatter={fmtNum} accent={ChartC.violet}/>
+        </Card>
+      </div>
+
+      <div className="dx-grid-2">
+        <Card title="Countries by revenue" sub="top 10">
+          <CountriesTable/>
+        </Card>
+        <Card title="Latest reviews" sub="across all apps" action={<button className="dx-link-btn">Stream →</button>}>
+          <ReviewsList compact/>
+        </Card>
+      </div>
+    </>
+  );
+}
+
+function AnomalyBar(){
+  const top = window.XZ.ANOMALIES.filter(a=>a.sev!=='good').slice(0,2);
+  return (
+    <div className="dx-anom-bar">
+      <div className="dx-anom-l">
+        <Icon name="sparkles" size={14} color="oklch(0.78 0.14 75)"/>
+        <span className="dx-anom-h">Highlights</span>
+      </div>
+      <div className="dx-anom-list">
+        {top.map((a,i)=>{
+          const app = window.XZ.APPS.find(x=>x.id===a.app);
+          return (
+            <div key={i} className={'dx-anom dx-sev-'+a.sev}>
+              <span className="dx-anom-dot"/>
+              <AppIcon app={app} size={20} radius={5}/>
+              <div className="dx-anom-t">{a.title}</div>
+              <span className="dx-anom-when">{a.when}</span>
+            </div>
+          );
+        })}
+      </div>
+      <button className="dx-link-btn">View all 4 →</button>
+    </div>
+  );
+}
+
+function Card({ title, sub, actions, action, children, dense }){
+  return (
+    <section className={'dx-card '+(dense?'dense':'')}>
+      <header className="dx-card-h">
+        <div>
+          <div className="dx-card-t">{title}</div>
+          {sub && <div className="dx-card-s">{sub}</div>}
+        </div>
+        <div className="dx-card-act">{actions}{action}</div>
+      </header>
+      <div className="dx-card-b">{children}</div>
+    </section>
+  );
+}
+
+function AppsTable({ apps, days, onSelect }){
+  const rows = apps.map(a=>{
+    const rev = sumRange(a.series.revenue, days);
+    const revP = sumRangePrev(a.series.revenue, days*2);
+    return { app:a, rev, delta:(rev-revP)/Math.max(1,revP), inst:sumRange(a.series.installs, days), dau:a.dau, rating:a.rating, crash:avgRange(a.series.crashRate, days) };
+  }).sort((a,b)=>b.rev-a.rev);
+  return (
+    <Card title="All apps" sub={`12 properties · last ${days} days`} actions={<button className="dx-btn"><Icon name="download" size={13}/> CSV</button>}>
+      <table className="dx-table">
+        <thead>
+          <tr>
+            <th>App</th><th>Platforms</th><th>Monetization</th>
+            <th className="r">Revenue</th><th className="r">Δ</th>
+            <th className="r">Installs</th><th className="r">DAU</th>
+            <th className="r">Rating</th><th className="r">Crash %</th>
+            <th className="r">Trend</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(r=>(
+            <tr key={r.app.id} onClick={()=>onSelect(r.app.id)} className="dx-row-clickable">
+              <td>
+                <div className="dx-cell-app">
+                  <AppIcon app={r.app} size={28} radius={6}/>
+                  <div>
+                    <div className="dx-cell-name">{r.app.name}</div>
+                    <div className="dx-cell-cat">{r.app.cat}</div>
+                  </div>
+                </div>
+              </td>
+              <td><PlatformBadges platforms={r.app.platforms} size={13}/></td>
+              <td><span className="dx-monet">{r.app.monet}</span></td>
+              <td className="r mono">{fmtMoney(r.rev)}</td>
+              <td className="r"><Delta value={r.delta} format={v=>fmtPct(v,1)}/></td>
+              <td className="r mono">{fmtNum(r.inst)}</td>
+              <td className="r mono">{fmtNum(r.dau)}</td>
+              <td className="r mono"><Icon name="star" size={11} color="oklch(0.78 0.14 75)"/> {r.rating.toFixed(2)}</td>
+              <td className="r mono" style={{color: r.crash>0.5?'oklch(0.7 0.16 25)':'inherit'}}>{r.crash.toFixed(2)}</td>
+              <td className="r"><Sparkline values={r.app.series.revenue.slice(-days)} color={r.app.color} height={20} width={64}/></td>
+              <td className="r"><Icon name="chevR" size={13} color="rgba(230,232,239,0.3)"/></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Card>
+  );
+}
+
+function AdsView({ apps, days }){
+  const units = window.XZ.AD_UNITS;
+  return (
+    <>
+      <div className="dx-grid-2">
+        <Card title="Earnings by ad format" sub={`AdMob · last ${days} days`}>
+          <ColumnChart rows={[
+            {label:'Banner',       a: units.filter(u=>u.fmt==='Banner').reduce((s,u)=>s+u.earn,0), b: 1820 },
+            {label:'Interstitial', a: units.filter(u=>u.fmt==='Interstitial').reduce((s,u)=>s+u.earn,0), b: 3400 },
+            {label:'Native',       a: units.filter(u=>u.fmt==='Native').reduce((s,u)=>s+u.earn,0), b: 1380 },
+            {label:'Rewarded',     a: units.filter(u=>u.fmt==='Rewarded').reduce((s,u)=>s+u.earn,0), b: 720 },
+          ]} formatter={fmtMoney} height={160}/>
+          <div className="dx-legend"><span><span className="dx-leg-d blue"/> This period</span> <span><span className="dx-leg-d gray"/> Previous</span></div>
+        </Card>
+        <Card title="Match rate & fill" sub="weighted across networks">
+          <div className="dx-meters">
+            <Meter label="Match rate"    value={0.94} target={0.95}/>
+            <Meter label="Show rate"     value={0.88} target={0.90}/>
+            <Meter label="Click-thru"    value={0.012} target={0.015} format={fmtPct}/>
+            <Meter label="Viewability"   value={0.81} target={0.80}/>
+          </div>
+        </Card>
+      </div>
+      <Card title="Ad units ranked by earnings" sub="top 10">
+        <table className="dx-table">
+          <thead><tr><th>Ad unit</th><th>App</th><th>Format</th><th className="r">Impressions</th><th className="r">eCPM</th><th className="r">Earnings</th></tr></thead>
+          <tbody>
+            {units.map(u=>{
+              const app = window.XZ.APPS.find(a=>a.id===u.app);
+              return (
+                <tr key={u.id}>
+                  <td className="dx-cell-name">{u.name}</td>
+                  <td><div className="dx-cell-app"><AppIcon app={app} size={22} radius={5}/><span>{app.name}</span></div></td>
+                  <td><Tag>{u.fmt}</Tag></td>
+                  <td className="r mono">{fmtNum(u.imp)}</td>
+                  <td className="r mono">${u.ecpm.toFixed(2)}</td>
+                  <td className="r mono">{fmtMoney(u.earn)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </Card>
+    </>
+  );
+}
+
+function Meter({ label, value, target, format }){
+  const fmt = format || fmtPct;
+  const ok = value >= target;
+  return (
+    <div className="dx-meter">
+      <div className="dx-meter-h">
+        <span>{label}</span>
+        <span className="mono" style={{color: ok?'oklch(0.74 0.14 150)':'oklch(0.78 0.14 75)'}}>{fmt(value)}</span>
+      </div>
+      <div className="dx-meter-b"><div className="dx-meter-fill" style={{width:(value*100)+'%', background: ok?'oklch(0.74 0.14 150)':'oklch(0.78 0.14 75)'}}/><div className="dx-meter-target" style={{left:(target*100)+'%'}}/></div>
+      <div className="dx-meter-f">target {fmt(target)}</div>
+    </div>
+  );
+}
+
+function ReviewsView(){
+  return (
+    <Card title="Review stream" sub="all apps · sorted by recency" actions={<><Tag color="oklch(0.74 0.14 150)">+ sentiment</Tag><Tag color="oklch(0.7 0.16 25)">- sentiment</Tag></>}>
+      <ReviewsList/>
+    </Card>
+  );
+}
+
+function ReviewsList({ compact }){
+  const list = compact ? window.XZ.REVIEWS.slice(0,5) : window.XZ.REVIEWS;
+  return (
+    <ul className="dx-reviews">
+      {list.map((r,i)=>{
+        const app = window.XZ.APPS.find(a=>a.id===r.app);
+        return (
+          <li key={i} className={'dx-review sent-'+r.sent}>
+            <AppIcon app={app} size={28} radius={6}/>
+            <div className="dx-review-body">
+              <div className="dx-review-head">
+                <span className="dx-review-name">{app.name}</span>
+                <span className="dx-review-stars">
+                  {Array.from({length:5}).map((_,k)=>(
+                    <Icon key={k} name="star" size={10} color={k<r.stars?'oklch(0.78 0.14 75)':'rgba(230,232,239,0.15)'}/>
+                  ))}
+                </span>
+                <span className="dx-review-when">{r.who} · {r.when}</span>
+              </div>
+              <div className="dx-review-text">{r.body}</div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function AnomaliesView({ onSelect }){
+  return (
+    <Card title="Anomaly feed" sub="auto-detected · last 7 days" actions={<Tag>4 active</Tag>}>
+      <ul className="dx-anom-feed">
+        {window.XZ.ANOMALIES.map((a,i)=>{
+          const app = window.XZ.APPS.find(x=>x.id===a.app);
+          return (
+            <li key={i} className={'dx-anom-item dx-sev-'+a.sev} onClick={()=>onSelect(a.app)}>
+              <div className="dx-anom-icon"><Icon name={a.sev==='good'?'sparkles':'warning'} size={14}/></div>
+              <AppIcon app={app} size={32} radius={7}/>
+              <div className="dx-anom-meta">
+                <div className="dx-anom-title">{a.title}</div>
+                <div className="dx-anom-detail">{a.detail}</div>
+              </div>
+              <div className="dx-anom-side">
+                <Tag>{app.name}</Tag>
+                <span className="dx-anom-when">{a.when}</span>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </Card>
+  );
+}
+
+function CohortView(){
+  const weeks = ['W0','W1','W2','W3','W4','W5','W6','W7'];
+  const cohorts = ['Apr 7','Apr 14','Apr 21','Apr 28','May 5','May 12','May 19','May 26'];
+  const vals = cohorts.map((_,i)=>weeks.map((_,j)=>{
+    if(j > weeks.length-1-i) return null;
+    const decay = Math.pow(0.78, j) + (i*0.01);
+    return Math.max(0.04, Math.min(1, decay + (i%3)*0.02 - j*0.005));
+  }));
+  return (
+    <>
+      <Card title="Retention by install week" sub="rolling D0–W7 · across all apps">
+        <Heatmap rows={cohorts} cols={weeks} values={vals} formatter={(v)=>(v*100).toFixed(0)+'%'}/>
+      </Card>
+      <div className="dx-grid-2">
+        <Card title="D1 / D7 / D30" sub="weighted average">
+          <div className="dx-stat-row big">
+            <div><b>62%</b><span>D1 retention</span></div>
+            <div><b>34%</b><span>D7 retention</span></div>
+            <div><b>18%</b><span>D30 retention</span></div>
+          </div>
+        </Card>
+        <Card title="Retention by category">
+          <BarChartH rows={[
+            {label:'Game maps',       value:0.41, color:ChartC.blue},
+            {label:'Game companions', value:0.32, color:ChartC.violet},
+            {label:'Music utility',   value:0.55, color:ChartC.green},
+            {label:'Wear OS',         value:0.61, color:ChartC.amber},
+          ]} formatter={(v)=>(v*100).toFixed(0)+'% D7'} max={1}/>
+        </Card>
+      </div>
+    </>
+  );
+}
+
+function SyncView(){
+  return (
+    <Card title="Connections" sub="data sources & last successful sync">
+      <ul className="dx-sync">
+        {window.XZ.SYNC_SOURCES.map((s,i)=>(
+          <li key={i} className={'dx-sync-i st-'+s.status}>
+            <div className={'dx-sync-dot st-'+s.status}/>
+            <div className="dx-sync-meta">
+              <div className="dx-sync-name">{s.name}</div>
+              <div className="dx-sync-d">{s.desc}</div>
+            </div>
+            <div className="dx-sync-time">{s.last}</div>
+            <button className="dx-btn-ghost">{s.status==='error'?'Re-authenticate':'Run now'}</button>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
+function CountriesTable(){
+  const cs = window.XZ.COUNTRIES;
+  const max = Math.max(...cs.map(c=>c.rev));
+  return (
+    <table className="dx-table compact">
+      <thead><tr><th>Country</th><th className="r">Users</th><th className="r">Revenue</th><th className="r">Share</th></tr></thead>
+      <tbody>
+        {cs.map(c=>(
+          <tr key={c.c}>
+            <td><span className="dx-flag">{c.flag}</span> {c.c}</td>
+            <td className="r mono">{fmtNum(c.users)}</td>
+            <td className="r mono">{fmtMoney(c.rev)}</td>
+            <td className="r" style={{minWidth:120}}>
+              <div className="dx-inline-bar"><div style={{width:(c.rev/max*100)+'%', background:ChartC.blue}}/></div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function Drilldown({ app, days, onClose }){
+  if(!app) return null;
+  const rev = sumRange(app.series.revenue, days);
+  const inst = sumRange(app.series.installs, days);
+  return (
+    <div className="dx-drawer-bg" onClick={onClose}>
+      <aside className="dx-drawer" onClick={e=>e.stopPropagation()}>
+        <header className="dx-drawer-h">
+          <div style={{display:'flex', gap:12, alignItems:'center'}}>
+            <AppIcon app={app} size={48}/>
+            <div>
+              <div className="dx-drawer-t">{app.name}</div>
+              <div className="dx-drawer-s">{app.cat} · {app.monet} <PlatformBadges platforms={app.platforms} size={11}/></div>
+            </div>
+          </div>
+          <button className="dx-icon-btn" onClick={onClose}><Icon name="close" size={14}/></button>
+        </header>
+        <div className="dx-drawer-body">
+          <div className="dx-stat-row">
+            <div><b>{fmtMoney(rev)}</b><span>revenue · {days}d</span></div>
+            <div><b>{fmtNum(inst)}</b><span>installs</span></div>
+            <div><b>{app.rating.toFixed(2)}★</b><span>rating</span></div>
+            <div><b>{app.crash.toFixed(2)}%</b><span>crash rate</span></div>
+          </div>
+          <Card title="Revenue · this app" sub={`AdMob + Play · last ${days} days`} dense>
+            <LineChart series={[
+              { label:'AdMob', values: app.series.admob.slice(-days), color: ChartC.blue },
+              { label:'Play',  values: app.series.play.slice(-days),  color: ChartC.amber },
+            ]} formatter={fmtMoney} height={160}/>
+          </Card>
+          <Card title="Installs vs crash" sub={`last ${days} days`} dense>
+            <LineChart series={[
+              { label:'Installs', values: app.series.installs.slice(-days), color: ChartC.violet },
+              { label:'Crash %',  values: app.series.crashRate.slice(-days), color: ChartC.red },
+            ]} formatter={fmtNum} height={140}/>
+          </Card>
+          <div className="dx-drawer-actions">
+            <button className="dx-btn"><Icon name="external" size={12}/> Open in Play Console</button>
+            <button className="dx-btn-ghost"><Icon name="external" size={12}/> AdMob</button>
+            <button className="dx-btn-ghost"><Icon name="download" size={12}/> Export</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+Object.assign(window, { Dashboard });
+  </script>
+
+  <!-- ── App entry ─────────────────────────────────────────────── -->
+  <script type="text/babel" data-presets="env,react">
+function App(){
+  const [user, setUser] = React.useState(null);
+  return user
+    ? <Dashboard user={user} onSignOut={()=>setUser(null)} onBackToSite={()=>{ window.location.href = 'index.html'; }}/>
+    : <LoginScreen onSignIn={setUser} onBack={()=>{ window.location.href = 'index.html'; }}/>;
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+  </script>
+</body>
+</html>
