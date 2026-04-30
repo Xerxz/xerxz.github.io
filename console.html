@@ -1929,8 +1929,12 @@ async function loadRealData(token) {
       console.error('[XZ] AdMob API exception:', e);
       out.syncStatus.admob = { ok: false };
     }
-      // ── AdMob: per-ad-unit breakdown (last 30 days) ──────────────────────
-      try {
+    // ── AdMob: per-ad-unit breakdown (last 30 days) ────────────────────────
+    try {
+      const idMap = out.admobIdToXz || {};
+      if (!Object.keys(idMap).length) {
+        console.log('[XZ] AdMob ad units: skipped — no app id mapping');
+      } else {
         const unitsListResp = await fetch(
           `https://admob.googleapis.com/v1/accounts/${cfg.admobPublisherId}/adUnits?pageSize=200`,
           { headers: h }
@@ -1968,7 +1972,7 @@ async function loadRealData(token) {
             const adUnitId  = dims.AD_UNIT?.value;
             const admobApp  = dims.APP?.value;
             const fmtLabel  = dims.FORMAT?.displayLabel || dims.FORMAT?.value || 'Unknown';
-            const ourId = admobIdToXz[admobApp];
+            const ourId = idMap[admobApp];
             if (!adUnitId || !ourId) return;
             const mv = row.metricValues || {};
             if (!unitAccum[adUnitId]) {
@@ -1987,11 +1991,8 @@ async function loadRealData(token) {
           out.admobAdUnits = Object.values(unitAccum).sort((a, b) => b.earn - a.earn).slice(0, 20);
           console.log('[XZ] AdMob: ad units loaded:', out.admobAdUnits.length);
         }
-      } catch(e) { console.error('[XZ] AdMob ad units error:', e); }
-    } catch(e) {
-      console.error('[XZ] AdMob API exception:', e);
-      out.syncStatus.admob = { ok: false };
-    }
+      }
+    } catch(e) { console.error('[XZ] AdMob ad units error:', e); }
   } else {
     console.log('[XZ] AdMob: skipped — publisherId not configured');
   }
