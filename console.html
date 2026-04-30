@@ -685,6 +685,9 @@ const CONFIG = {
   clientId: '536915898269-tc5ngarhmklgmvb9lo564ii33b3rru56.apps.googleusercontent.com',
   allowedEmails: ['simon.krabbas@gmail.com', 'xerxz5115@gmail.com'],
   admobPublisherId: 'pub-7293552940447783',
+  // Find your bucket ID in Play Console → Download reports → Copy Cloud Storage URI
+  // e.g. 'pubsite_prod_rev_01234567890987654321'
+  gcsReportsBucket: 'pubsite_prod_rev_03106521764692326330',
   packages: {
     raiders:  'com.xerxz.arcraiderscompanion',
     chord2:   'com.xerxz.chordfinder2',
@@ -736,12 +739,13 @@ const REVIEWS    = [];
 const ANOMALIES  = [];
 
 const SYNC_SOURCES = [
-  { name:'Google Play Developer Reporting', last:'—', status:'pending', desc:'Crash rates, ANR rates · signs in on first load' },
-  { name:'AdMob Reporting v1',              last:'—', status:'pending', desc:'Earnings, impressions, eCPM, match rate, ad units' },
+  { name:'Google Play Developer Reporting', last:'—', status:'pending', desc:'Crash rates, ANR rates, anomalies · signs in on first load' },
+  { name:'AdMob Reporting v1',              last:'—', status:'pending', desc:'Earnings, impressions, eCPM, match rate, ad units, clicks' },
   { name:'Android Publisher API',           last:'—', status:'pending', desc:'Reviews per app' },
+  { name:'Play Console Download Reports',   last:'Not configured', status:'pending', desc:'Install counts, downloads, uninstalls · requires GCS bucket access (service account + devstorage.readonly scope)' },
 ];
 
-window.XZ = { APPS, COUNTRIES, AD_UNITS, REVIEWS, ANOMALIES, SYNC_SOURCES, HORIZON };
+window.XZ = { APPS, COUNTRIES, AD_UNITS, REVIEWS, ANOMALIES, SYNC_SOURCES, HORIZON, ADMOB_GLOBAL: {} };
   </script>
 
   <!-- ── ui.jsx ────────────────────────────────────────────────── -->
@@ -1117,6 +1121,7 @@ function LoginScreen({ onSignIn, onBack }){
         'https://www.googleapis.com/auth/androidpublisher',
         'https://www.googleapis.com/auth/admob.readonly',
         'https://www.googleapis.com/auth/playdeveloperreporting',
+        'https://www.googleapis.com/auth/devstorage.read_only',
       ].join(' '),
       callback: async (resp) => {
         if (resp.error) {
@@ -1301,9 +1306,9 @@ function DxSidebar({ tab, setTab, user, onSignOut, onBackToSite }){
     { id:'apps',      icon:'apps',     label:'Apps' },
     { id:'ads',       icon:'dollar',   label:'Ad units' },
     { id:'reviews',   icon:'star',     label:'Reviews' },
-    { id:'anomalies', icon:'warning',  label:'Anomalies', badge:3 },
+    { id:'anomalies', icon:'warning',  label:'Anomalies', badge: window.XZ.ANOMALIES.length || null },
     { id:'cohort',    icon:'grid',     label:'Cohorts' },
-    { id:'sync',      icon:'refresh',  label:'Sync status', badge:'!' },
+    { id:'sync',      icon:'refresh',  label:'Sync status', badge: window.XZ.SYNC_SOURCES.some(s=>s.status==='error') ? '!' : null },
   ];
   return (
     <aside className="dx-side">
@@ -1581,12 +1586,14 @@ function AdsView({ apps, days }){
           ]} formatter={fmtMoney} height={160}/>
           <div className="dx-legend"><span><span className="dx-leg-d blue"/> This period</span> <span><span className="dx-leg-d gray"/> Previous</span></div>
         </Card>
-        <Card title="Match rate & fill" sub="weighted across networks">
+        <Card title="Match rate & fill" sub="weighted across networks · last 90 days">
           <div className="dx-meters">
-            <Meter label="Match rate"    value={0.94} target={0.95}/>
-            <Meter label="Show rate"     value={0.88} target={0.90}/>
-            <Meter label="Click-thru"    value={0.012} target={0.015} format={fmtPct}/>
-            <Meter label="Viewability"   value={0.81} target={0.80}/>
+            {(()=>{ const g = window.XZ.ADMOB_GLOBAL || {}; const hasData = g.adRequests > 0; return (<>
+              <Meter label="Match rate"    value={hasData ? g.matchRate  : 0} target={0.95}/>
+              <Meter label="Show rate"     value={hasData ? g.showRate   : 0} target={0.90}/>
+              <Meter label="Click-thru"    value={hasData ? g.clickRate  : 0} target={0.015} format={fmtPct}/>
+              {!hasData && <span style={{fontSize:11,color:'rgba(230,232,239,0.4)'}}>Live data loads after sign-in</span>}
+            </>); })()}
           </div>
         </Card>
       </div>
@@ -1667,7 +1674,7 @@ function ReviewsList({ compact }){
 
 function AnomaliesView({ onSelect }){
   return (
-    <Card title="Anomaly feed" sub="auto-detected · last 7 days" actions={<Tag>4 active</Tag>}>
+    <Card title="Anomaly feed" sub="auto-detected · Play Developer Reporting" actions={<Tag>{window.XZ.ANOMALIES.length || 0} active</Tag>}>
       <ul className="dx-anom-feed">
         {window.XZ.ANOMALIES.map((a,i)=>{
           const app = window.XZ.APPS.find(x=>x.id===a.app);
@@ -1824,7 +1831,7 @@ Object.assign(window, { Dashboard });
 async function loadRealData(token) {
   const h = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
   const cfg = window.CONFIG;
-  const out = { admobEarnings: {}, reviews: null, crashRates: {}, syncStatus: {} };
+  const out = { admobEarnings: {}, admobAdUnits: [], admobGlobal: { adReq:0, matched:0, impr:0, clicks:0 }, reviews: null, crashRates: {}, anrRates: {}, anomalies: [], installsByApp: {}, ratingsByApp: {}, syncStatus: {} };
 
   console.log('[XZ] loadRealData start — packages:', cfg.packages);
 
@@ -1850,11 +1857,12 @@ async function loadRealData(token) {
 
       const pkgToId = {};
       Object.entries(cfg.packages).forEach(([id, pkg]) => { pkgToId[pkg] = id; });
-      const admobIdToXz = {};
+      out.admobIdToXz = {};
       admobApps.forEach(a => {
         const pkg = a.linkedAppInfo?.androidAppId || a.linkedAppInfo?.appStoreId;
-        if (pkg && pkgToId[pkg] && a.appId) admobIdToXz[a.appId] = pkgToId[pkg];
+        if (pkg && pkgToId[pkg] && a.appId) out.admobIdToXz[a.appId] = pkgToId[pkg];
       });
+      const admobIdToXz = out.admobIdToXz;
       console.log('[XZ] AdMob: ID→XZ mapping:', admobIdToXz);
       if (!Object.keys(admobIdToXz).length)
         console.warn('[XZ] AdMob: mapping empty — compare androidPkg values above with CONFIG.packages');
@@ -1869,7 +1877,7 @@ async function loadRealData(token) {
             reportSpec: {
               dateRange: { startDate: fmt(start), endDate: fmt(end) },
               dimensions: ['APP', 'DATE'],
-              metrics: ['ESTIMATED_EARNINGS', 'IMPRESSIONS', 'IMPRESSION_RPM'],
+              metrics: ['ESTIMATED_EARNINGS', 'IMPRESSIONS', 'IMPRESSION_RPM', 'AD_REQUESTS', 'MATCHED_REQUESTS', 'CLICKS'],
               sortConditions: [{ dimension: 'DATE', order: 'ASCENDING' }],
               localizationSettings: { currencyCode: 'SEK' },
             }
@@ -1892,11 +1900,19 @@ async function loadRealData(token) {
           if (!ourId || !dateVal) return;
           if (!out.admobEarnings[ourId]) out.admobEarnings[ourId] = {};
           const mv = row.metricValues || {};
+          const adReq  = parseInt(mv.AD_REQUESTS?.integerValue ?? 0);
+          const matched = parseInt(mv.MATCHED_REQUESTS?.integerValue ?? 0);
+          const clicks  = parseInt(mv.CLICKS?.integerValue ?? 0);
           out.admobEarnings[ourId][dateVal] = {
             earn: (parseInt(mv.ESTIMATED_EARNINGS?.microsValue ?? 0)) / 1e6,
             impr: parseInt(mv.IMPRESSIONS?.integerValue ?? 0),
             ecpm: (parseInt(mv.IMPRESSION_RPM?.microsValue ?? 0)) / 1e6,
+            adReq, matched, clicks,
           };
+          out.admobGlobal.adReq    += adReq;
+          out.admobGlobal.matched  += matched;
+          out.admobGlobal.impr     += parseInt(mv.IMPRESSIONS?.integerValue ?? 0);
+          out.admobGlobal.clicks   += clicks;
         });
         const summary = Object.entries(out.admobEarnings).map(([id, days]) => ({
           id, days: Object.keys(days).length,
@@ -1909,6 +1925,69 @@ async function loadRealData(token) {
         console.error('[XZ] AdMob report error:', errBody);
         out.syncStatus.admob = { ok: false };
       }
+    } catch(e) {
+      console.error('[XZ] AdMob API exception:', e);
+      out.syncStatus.admob = { ok: false };
+    }
+      // ── AdMob: per-ad-unit breakdown (last 30 days) ──────────────────────
+      try {
+        const unitsListResp = await fetch(
+          `https://admob.googleapis.com/v1/accounts/${cfg.admobPublisherId}/adUnits?pageSize=200`,
+          { headers: h }
+        );
+        const adUnitMeta = {};
+        if (unitsListResp.ok) {
+          const body = await unitsListResp.json();
+          (body.adUnits || []).forEach(u => {
+            adUnitMeta[u.adUnitId] = { name: u.displayName || u.adUnitId, fmt: u.adFormat || 'Unknown' };
+          });
+        }
+        const fmtU = d => ({ year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() });
+        const end30 = new Date(), start30 = new Date(Date.now() - 29 * 864e5);
+        const unitRptResp = await fetch(
+          `https://admob.googleapis.com/v1/accounts/${cfg.admobPublisherId}/networkReport:generate`,
+          { method: 'POST', headers: h, body: JSON.stringify({
+              reportSpec: {
+                dateRange: { startDate: fmtU(start30), endDate: fmtU(end30) },
+                dimensions: ['AD_UNIT', 'FORMAT', 'APP'],
+                metrics: ['ESTIMATED_EARNINGS', 'IMPRESSIONS', 'IMPRESSION_RPM'],
+                sortConditions: [{ metric: 'ESTIMATED_EARNINGS', order: 'DESCENDING' }],
+                localizationSettings: { currencyCode: 'SEK' },
+              }
+            })
+          }
+        );
+        if (unitRptResp.ok) {
+          const raw = await unitRptResp.text();
+          let items2 = [];
+          try { const p = JSON.parse(raw); items2 = Array.isArray(p) ? p : [p]; }
+          catch { items2 = raw.trim().split('\n').map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean); }
+          const unitAccum = {};
+          items2.filter(o => o?.row).forEach(({ row }) => {
+            const dims = row.dimensionValues || {};
+            const adUnitId  = dims.AD_UNIT?.value;
+            const admobApp  = dims.APP?.value;
+            const fmtLabel  = dims.FORMAT?.displayLabel || dims.FORMAT?.value || 'Unknown';
+            const ourId = admobIdToXz[admobApp];
+            if (!adUnitId || !ourId) return;
+            const mv = row.metricValues || {};
+            if (!unitAccum[adUnitId]) {
+              unitAccum[adUnitId] = {
+                id: adUnitId,
+                name: adUnitMeta[adUnitId]?.name || adUnitId,
+                app: ourId,
+                fmt: fmtLabel,
+                imp: 0, earn: 0, ecpm: 0,
+              };
+            }
+            unitAccum[adUnitId].earn += parseInt(mv.ESTIMATED_EARNINGS?.microsValue ?? 0) / 1e6;
+            unitAccum[adUnitId].imp  += parseInt(mv.IMPRESSIONS?.integerValue ?? 0);
+            unitAccum[adUnitId].ecpm  = parseInt(mv.IMPRESSION_RPM?.microsValue ?? 0) / 1e6;
+          });
+          out.admobAdUnits = Object.values(unitAccum).sort((a, b) => b.earn - a.earn).slice(0, 20);
+          console.log('[XZ] AdMob: ad units loaded:', out.admobAdUnits.length);
+        }
+      } catch(e) { console.error('[XZ] AdMob ad units error:', e); }
     } catch(e) {
       console.error('[XZ] AdMob API exception:', e);
       out.syncStatus.admob = { ok: false };
@@ -1962,40 +2041,190 @@ async function loadRealData(token) {
   const fmtDT = d => ({ year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate(), timeZone: { id: 'UTC' } });
   for (const [id, pkg] of Object.entries(cfg.packages)) {
     if (pkg.startsWith('REPLACE')) continue;
-    console.log(`[XZ] Crash rates: fetching for ${id} (${pkg})`);
+    console.log(`[XZ] Vitals: fetching crash+ANR for ${id} (${pkg})`);
+    const vitalsBody = JSON.stringify({
+      timelineSpec: { aggregationPeriod: 'DAILY', startTime: fmtDT(startCrash), endTime: fmtDT(end) },
+      dimensions: [], pageSize: 90,
+    });
     try {
-      const r = await fetch(
-        `https://playdeveloperreporting.googleapis.com/v1beta1/apps/${encodeURIComponent(pkg)}/crashRateMetricSet:query`,
-        { method: 'POST', headers: h, body: JSON.stringify({
-            timelineSpec: { aggregationPeriod: 'DAILY', startTime: fmtDT(startCrash), endTime: fmtDT(end) },
-            dimensions: [],
-            metrics: ['crashRate'],
-            pageSize: 90,
-          })
-        }
-      );
-      console.log(`[XZ] Crash rates: ${pkg} → status ${r.status}`);
-      if (r.ok) {
-        const data = await r.json();
+      const [crashResp, anrResp] = await Promise.all([
+        fetch(
+          `https://playdeveloperreporting.googleapis.com/v1beta1/apps/${encodeURIComponent(pkg)}/crashRateMetricSet:query`,
+          { method: 'POST', headers: h, body: JSON.stringify({
+              timelineSpec: { aggregationPeriod: 'DAILY', startTime: fmtDT(startCrash), endTime: fmtDT(end) },
+              dimensions: [], metrics: ['crashRate'], pageSize: 90,
+            })
+          }
+        ),
+        fetch(
+          `https://playdeveloperreporting.googleapis.com/v1beta1/apps/${encodeURIComponent(pkg)}/anrRateMetricSet:query`,
+          { method: 'POST', headers: h, body: JSON.stringify({
+              timelineSpec: { aggregationPeriod: 'DAILY', startTime: fmtDT(startCrash), endTime: fmtDT(end) },
+              dimensions: [], metrics: ['anrRate'], pageSize: 90,
+            })
+          }
+        ),
+      ]);
+      console.log(`[XZ] Vitals: ${pkg} → crash ${crashResp.status}, ANR ${anrResp.status}`);
+      if (crashResp.ok) {
+        const data = await crashResp.json();
         const rowCount = data.rows?.length || 0;
-        console.log(`[XZ] Crash rates: ${pkg} → ${rowCount} rows`);
         if (rowCount) {
           out.crashRates[id] = data.rows.map(row => {
             const m = (row.metrics || []).find(x => x.metric === 'crashRate');
             return parseFloat(m?.decimalValue ?? '0') * 100;
           });
         }
-      } else {
-        const errBody = await r.text();
-        console.warn(`[XZ] Crash rates: ${pkg} error:`, errBody);
+      } else { console.warn(`[XZ] Crash rates: ${pkg} error ${crashResp.status}`); }
+      if (anrResp.ok) {
+        const data = await anrResp.json();
+        const rowCount = data.rows?.length || 0;
+        if (rowCount) {
+          out.anrRates[id] = data.rows.map(row => {
+            const m = (row.metrics || []).find(x => x.metric === 'anrRate');
+            return parseFloat(m?.decimalValue ?? '0') * 100;
+          });
+        }
+      } else { console.warn(`[XZ] ANR rates: ${pkg} error ${anrResp.status}`); }
+    } catch(e) { console.error(`[XZ] Vitals exception for ${pkg}:`, e); }
+  }
+
+  // ── Anomalies (Play Developer Reporting) ────────────────────────────────
+  for (const [id, pkg] of Object.entries(cfg.packages)) {
+    if (pkg.startsWith('REPLACE')) continue;
+    try {
+      const r = await fetch(
+        `https://playdeveloperreporting.googleapis.com/v1beta1/apps/${encodeURIComponent(pkg)}/anomalies?pageSize=10`,
+        { headers: h }
+      );
+      if (r.ok) {
+        const data = await r.json();
+        const metricTitle = m => {
+          if (!m) return 'Anomaly detected';
+          if (m.includes('crash'))         return 'Crash rate spike';
+          if (m.includes('anr'))           return 'ANR rate spike';
+          if (m.includes('slowStart'))     return 'Slow start degradation';
+          if (m.includes('slowRendering')) return 'Slow rendering detected';
+          if (m.includes('wakeup'))        return 'Excessive wakeups';
+          if (m.includes('wakelock'))      return 'Stuck wakelock';
+          if (m.includes('lmk'))           return 'Low memory kills';
+          return 'Metric anomaly';
+        };
+        const metricSev = m => {
+          if (!m) return 'warn';
+          if (m.includes('crash') || m.includes('anr')) return 'crit';
+          return 'med';
+        };
+        (data.anomalies || []).forEach(a => {
+          const metric = a.metricSet || '';
+          const st = a.timelineSpec?.startTime;
+          const when = st ? `${st.month}/${st.day}` : '—';
+          out.anomalies.push({ app: id, sev: metricSev(metric), title: metricTitle(metric), detail: metric.replace('MetricSet',''), when });
+        });
       }
-    } catch(e) { console.error(`[XZ] Crash rates exception for ${pkg}:`, e); }
+    } catch(e) { /* anomaly fetch is best-effort */ }
+  }
+  console.log('[XZ] Anomalies found:', out.anomalies.length);
+
+  // ── GCS Download Reports: installs + ratings ─────────────────────────────
+  if (cfg.gcsReportsBucket) {
+    const bucket = cfg.gcsReportsBucket;
+    console.log('[XZ] GCS: fetching reports from', bucket);
+
+    // GCS JSON API: download object as media, returns ArrayBuffer for UTF-16 LE decoding
+    const fetchGcsCSV = async (path) => {
+      const url = `https://storage.googleapis.com/storage/v1/b/${bucket}/o/${encodeURIComponent(path)}?alt=media`;
+      const resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (!resp.ok) { console.warn(`[XZ] GCS 404/error for ${path}: ${resp.status}`); return null; }
+      const buf = await resp.arrayBuffer();
+      let text = new TextDecoder('utf-16le').decode(buf);
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1); // strip BOM
+      return text;
+    };
+
+    const parseCSV = (text) => {
+      if (!text) return [];
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      if (lines.length < 2) return [];
+      const splitRow = line => {
+        const cols = []; let cur = '', inQ = false;
+        for (const c of line) {
+          if (c === '"') { inQ = !inQ; }
+          else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+          else { cur += c; }
+        }
+        cols.push(cur.trim());
+        return cols;
+      };
+      const headers = splitRow(lines[0]);
+      return lines.slice(1).map(line => {
+        const vals = splitRow(line);
+        const obj = {};
+        headers.forEach((hd, i) => { obj[hd] = vals[i] ?? ''; });
+        return obj;
+      });
+    };
+
+    // Build list of YYYYMM strings covering the last 90 days
+    const monthsNeeded = new Set();
+    const today90 = new Date();
+    for (let i = 0; i < 90; i++) {
+      const d = new Date(today90); d.setDate(d.getDate() - i);
+      monthsNeeded.add(`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}`);
+    }
+    const monthList = [...monthsNeeded].sort().reverse(); // newest first
+
+    for (const [id, pkg] of Object.entries(cfg.packages)) {
+      if (pkg.startsWith('REPLACE')) continue;
+      const installsByDate = {};
+      const ratingsByDate = {};
+
+      for (const ym of monthList) {
+        // Installs overview (no dimension = totals across all devices)
+        try {
+          const csv = await fetchGcsCSV(`stats/installs/installs_${pkg}_${ym}_overview.csv`);
+          parseCSV(csv).forEach(row => {
+            const date = row['Date'];
+            if (!date) return;
+            const daily    = parseInt(row['Daily Device Installs']       || '0', 10);
+            const uninstall= parseInt(row['Daily Device Uninstallations']|| '0', 10);
+            const active   = parseInt(row['Installs On Active Devices']  || '0', 10);
+            const current  = parseInt(row['Current Device Installs']     || '0', 10);
+            installsByDate[date] = { daily, uninstall, active, current };
+          });
+        } catch(e) { /* skip */ }
+
+        // Ratings overview
+        try {
+          const csv = await fetchGcsCSV(`stats/ratings/ratings_${pkg}_${ym}_overview.csv`);
+          parseCSV(csv).forEach(row => {
+            const date = row['Date'];
+            const avg  = parseFloat(row['Daily Average Rating'] || '0');
+            if (date && avg > 0) ratingsByDate[date] = avg;
+          });
+        } catch(e) { /* skip */ }
+      }
+
+      if (Object.keys(installsByDate).length) {
+        out.installsByApp[id] = installsByDate;
+        console.log(`[XZ] GCS installs for ${id}: ${Object.keys(installsByDate).length} days`);
+      }
+      if (Object.keys(ratingsByDate).length) {
+        out.ratingsByApp[id] = ratingsByDate;
+      }
+    }
+    out.syncStatus.gcs = { ok: Object.keys(out.installsByApp).length > 0 };
+  } else {
+    console.log('[XZ] GCS: skipped — gcsReportsBucket not configured in CONFIG');
   }
 
   console.log('[XZ] loadRealData done:', {
     admobApps: Object.keys(out.admobEarnings).length,
     reviews: out.reviews?.length ?? 0,
     crashApps: Object.keys(out.crashRates).length,
+    anrApps: Object.keys(out.anrRates).length,
+    anomalies: out.anomalies.length,
+    adUnits: out.admobAdUnits.length,
     syncStatus: out.syncStatus,
   });
   return out;
@@ -2046,14 +2275,75 @@ function applyRealData(updates) {
     console.log(`[XZ] Applied crash rate for ${id}: latest=${app.crash.toFixed(3)}%`);
   });
 
+  Object.entries(updates.anrRates).forEach(([id, series]) => {
+    const app = XZ.APPS.find(a => a.id === id);
+    if (!app || !series.length) return;
+    const padded = new Array(HORIZON).fill(series[0] || 0);
+    series.forEach((v, i) => { const idx = HORIZON - series.length + i; if (idx >= 0) padded[idx] = v; });
+    app.series.anrRate = padded;
+    console.log(`[XZ] Applied ANR rate for ${id}: latest=${(series[series.length-1]??0).toFixed(3)}%`);
+  });
+
+  if (updates.anomalies.length) {
+    XZ.ANOMALIES = updates.anomalies;
+    console.log('[XZ] Applied', updates.anomalies.length, 'anomalies');
+  }
+
+  if (updates.admobAdUnits.length) {
+    XZ.AD_UNITS = updates.admobAdUnits;
+    console.log('[XZ] Applied', updates.admobAdUnits.length, 'ad units');
+  }
+
+  Object.entries(updates.installsByApp).forEach(([id, byDate]) => {
+    const app = XZ.APPS.find(a => a.id === id);
+    if (!app) return;
+    const newInstalls = new Array(HORIZON).fill(0);
+    let latestActive = 0, latestCurrent = 0;
+    Object.entries(byDate).forEach(([ds, { daily, active, current }]) => {
+      const [y, mo, d] = ds.split('-').map(Number);
+      const daysAgo = Math.round((today - new Date(y, mo-1, d)) / 864e5);
+      const idx = HORIZON - 1 - daysAgo;
+      if (idx >= 0 && idx < HORIZON) newInstalls[idx] = daily;
+      if (daysAgo <= 3) { latestActive = Math.max(latestActive, active); latestCurrent = Math.max(latestCurrent, current); }
+    });
+    app.series.installs = newInstalls;
+    app.inst30 = newInstalls.slice(-30).reduce((s, v) => s + v, 0);
+    if (latestActive > 0) app.dau = latestActive;
+    if (latestCurrent > 0) app.totalInstalls = latestCurrent;
+    console.log(`[XZ] Applied installs for ${id}: inst30=${app.inst30}, active=${latestActive}`);
+  });
+
+  Object.entries(updates.ratingsByApp).forEach(([id, byDate]) => {
+    const app = XZ.APPS.find(a => a.id === id);
+    if (!app) return;
+    const sorted = Object.entries(byDate).sort(([a], [b]) => a.localeCompare(b));
+    if (sorted.length) {
+      app.rating = parseFloat(sorted[sorted.length - 1][1]);
+      console.log(`[XZ] Applied rating for ${id}: ${app.rating.toFixed(2)}`);
+    }
+  });
+
+  const g = updates.admobGlobal;
+  XZ.ADMOB_GLOBAL = {
+    matchRate:  g.matched / Math.max(1, g.adReq),
+    showRate:   g.impr    / Math.max(1, g.matched),
+    clickRate:  g.clicks  / Math.max(1, g.impr),
+    adRequests: g.adReq,
+    clicks:     g.clicks,
+  };
+
   const nowStr = new Date().toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
   XZ.SYNC_SOURCES = XZ.SYNC_SOURCES.map(s => {
     if (s.name.includes('AdMob'))
       return { ...s, last: updates.syncStatus.admob?.ok ? nowStr : 'failed', status: updates.syncStatus.admob?.ok ? 'ok' : 'error' };
-    if (s.name.includes('Reporting'))
+    if (s.name.includes('Play Developer Reporting'))
       return { ...s, last: Object.keys(updates.crashRates).length ? nowStr : s.last, status: Object.keys(updates.crashRates).length ? 'ok' : 'error' };
     if (s.name.includes('Android Publisher'))
       return { ...s, last: updates.syncStatus.reviews?.ok ? nowStr : 'failed', status: updates.syncStatus.reviews?.ok ? 'ok' : 'error' };
+    if (s.name.includes('Download Reports')) {
+      if (!window.CONFIG.gcsReportsBucket) return s; // leave as 'Not configured'
+      return { ...s, last: updates.syncStatus.gcs?.ok ? nowStr : 'failed', status: updates.syncStatus.gcs?.ok ? 'ok' : 'error' };
+    }
     return s;
   });
   console.log('[XZ] applyRealData done — sync sources updated');
