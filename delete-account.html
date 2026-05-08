@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delete Account — Stratagems | Xerxz</title>
+  <title>Delete Account — Stratagems & Clean Plate | Xerxz</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
@@ -350,9 +350,9 @@
     <div class="delete-card">
       <div class="delete-icon">🗑️</div>
 
-      <h1>Delete Your Stratagems Account</h1>
+      <h1>Delete Your Stratagems or Clean Plate Account</h1>
       <p class="subtitle">
-        Request deletion of your account and all associated data from the Stratagems app.
+        Request deletion of your account and all associated data from the Stratagems app or Clean Plate app.
         This action is permanent and cannot be undone.
       </p>
 
@@ -361,6 +361,7 @@
         <h3>Data that will be deleted</h3>
         <ul class="info-list">
           <li>Your profile, username, and profile picture</li>
+          <li>Scan history</li>
           <li>High scores and leaderboard entries</li>
           <li>Sample balances (common, rare, super)</li>
           <li>Purchased inventory items and loadout data</li>
@@ -435,10 +436,10 @@ function submitDeletion(e) {
   }
 
   // Build mailto link
-  const subject = encodeURIComponent('Account Deletion Request — Stratagems');
+  const subject = encodeURIComponent('Account Deletion Request — Stratagems or Clean Plate');
   const body = encodeURIComponent(
     `Hello,\n\n` +
-    `I would like to request the deletion of my Stratagems account and all associated data.\n\n` +
+    `I would like to request the deletion of my Stratagems or Clean Plate account and all associated data.\n\n` +
     `Account email: ${email}\n` +
     `In-game username: ${username || 'Not provided'}\n` +
     `Reason: ${reason || 'Not provided'}\n\n` +
