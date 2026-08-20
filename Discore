@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07130d">
+  <meta name="description" content="Discore is the totally free, no-bullshit disc golf scoring app for Android and Wear OS. Unlimited scorecards, no ads, no accounts and no paywalls.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Discore — Disc golf scoring without the bullshit">
+  <meta property="og:description" content="Totally free disc golf scoring for Android and Wear OS. Unlimited scorecards. No ads. No accounts. No paywalls.">
+  <meta property="og:image" content="YOUR_PUBLIC_SITE_URL/media/og-cover.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Discore — Free disc golf scoring">
+  <meta name="twitter:description" content="Unlimited scorecards on Android and Wear OS. No ads, accounts or paywalls.">
+  <meta name="twitter:image" content="YOUR_PUBLIC_SITE_URL/media/og-cover.jpg">
+  <link rel="icon" href="media/app-icon.png">
+  <title>Discore — Free disc golf scoring for Android &amp; Wear OS</title>
+
+  <!--
+    BEFORE PUBLISHING:
+    1. Replace YOUR LEGAL NAME OR STUDIO and YOUR_EMAIL@example.com below.
+    2. Replace YOUR_PUBLIC_SITE_URL and the two YOUR_GITHUB_* values.
+    3. Upload the files listed in ASSETS.md to the media/ folder.
+  -->
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f4f8f4;
+      --muted: #a9b8ad;
+      --dim: #728178;
+      --green: #8fe0ad;
+      --green-strong: #b9f5ce;
+      --green-dark: #0e2c1d;
+      --amber: #ffc65a;
+      --canvas: #07130d;
+      --surface: rgba(20, 39, 29, .74);
+      --surface-solid: #12251a;
+      --line: rgba(178, 235, 198, .16);
+      --shadow: 0 35px 90px rgba(0, 0, 0, .42);
+      --radius: 28px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 96px;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(67, 184, 110, .20), transparent 30rem),
+        radial-gradient(circle at 88% 18%, rgba(255, 182, 59, .10), transparent 26rem),
+        radial-gradient(circle at 50% 80%, rgba(45, 132, 84, .16), transparent 35rem),
+        var(--canvas);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .33;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.25) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 70% 65%, rgba(255,255,255,.18) 0 1px, transparent 1.5px);
+      background-size: 73px 73px, 109px 109px;
+      mask-image: linear-gradient(to bottom, black, transparent 75%);
+    }
+
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    .container {
+      width: min(calc(100% - 40px), var(--max));
+      margin-inline: auto;
+    }
+
+    .skip-link {
+      position: fixed;
+      left: 14px;
+      top: 14px;
+      z-index: 100;
+      transform: translateY(-160%);
+      padding: 10px 14px;
+      border-radius: 12px;
+      color: #062313;
+      background: var(--green);
+      font-weight: 800;
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(7, 19, 13, .72);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 900;
+      font-size: 1.18rem;
+      letter-spacing: -.02em;
+    }
+
+    .brand-mark {
+      width: 37px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(143, 224, 173, .28);
+      border-radius: 12px;
+      color: var(--green);
+      background: rgba(143, 224, 173, .10);
+      font-size: 1.25rem;
+      box-shadow: inset 0 0 20px rgba(143, 224, 173, .06);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      padding: 10px 13px;
+      border-radius: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .92rem;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--ink);
+      background: rgba(255,255,255,.06);
+      outline: none;
+    }
+
+    .hero {
+      position: relative;
+      min-height: calc(100svh - 76px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(390px, .96fr);
+      align-items: center;
+      gap: clamp(36px, 7vw, 90px);
+      padding-block: clamp(72px, 10vw, 140px);
+    }
+
+    .hero-copy { position: relative; z-index: 2; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 22px;
+      color: var(--green);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 2px;
+      border-radius: 10px;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+      line-height: 1.05;
+      letter-spacing: -.045em;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin-bottom: 24px;
+      font-size: clamp(3.35rem, 7.8vw, 7rem);
+      font-weight: 950;
+    }
+
+    .gradient-text {
+      color: transparent;
+      background: linear-gradient(120deg, var(--green-strong), var(--green) 52%, var(--amber));
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .hero-lead {
+      max-width: 640px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1.12rem, 2vw, 1.35rem);
+    }
+
+    .hero-lead strong { color: var(--ink); }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .button {
+      min-height: 54px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 13px 20px;
+      border: 1px solid transparent;
+      border-radius: 16px;
+      text-decoration: none;
+      font-weight: 900;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .button:hover { transform: translateY(-2px); }
+    .button:focus-visible { outline: 3px solid rgba(143,224,173,.5); outline-offset: 3px; }
+
+    .button-primary {
+      color: #062313;
+      background: var(--green);
+      box-shadow: 0 14px 34px rgba(63, 190, 110, .25);
+    }
+
+    .button-secondary {
+      border-color: var(--line);
+      color: var(--ink);
+      background: rgba(255,255,255,.045);
+    }
+
+    .micro-proof {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      margin: 26px 0 0;
+      padding: 0;
+      color: var(--muted);
+      list-style: none;
+      font-size: .92rem;
+      font-weight: 700;
+    }
+
+    .micro-proof li::before {
+      content: "✓";
+      margin-right: 7px;
+      color: var(--green);
+      font-weight: 1000;
+    }
+
+    .showcase {
+      position: relative;
+      min-height: 650px;
+      isolation: isolate;
+    }
+
+    .showcase::before {
+      content: "";
+      position: absolute;
+      width: 480px;
+      aspect-ratio: 1;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(143,224,173,.13);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(63, 190, 110, .18), rgba(63, 190, 110, .02) 55%, transparent 70%);
+      box-shadow: 0 0 100px rgba(63, 190, 110, .13);
+      z-index: -1;
+    }
+
+    .phone {
+      position: absolute;
+      width: min(310px, 68vw);
+      aspect-ratio: 9 / 19.5;
+      padding: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 46px;
+      background: #111914;
+      box-shadow: var(--shadow), inset 0 0 0 2px rgba(255,255,255,.04);
+    }
+
+    .phone::after {
+      content: "";
+      position: absolute;
+      width: 38%;
+      height: 22px;
+      top: 17px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 20px;
+      background: #07100b;
+      z-index: 3;
+    }
+
+    .phone-main { right: 10%; top: 1%; transform: rotate(4deg); z-index: 2; }
+    .phone-back { left: 2%; bottom: 1%; transform: rotate(-8deg) scale(.86); opacity: .76; }
+
+    .media-frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 37px;
+      color: var(--green);
+      background:
+        linear-gradient(145deg, rgba(143,224,173,.12), transparent 46%),
+        #0c1d13;
+    }
+
+    .media-frame::before {
+      content: attr(data-placeholder);
+      max-width: 70%;
+      color: var(--muted);
+      text-align: center;
+      font-size: .86rem;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .media-frame img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .watch {
+      position: absolute;
+      right: 0;
+      bottom: 4%;
+      width: 190px;
+      aspect-ratio: 1;
+      padding: 10px;
+      overflow: hidden;
+      border: 9px solid #22332a;
+      border-radius: 50%;
+      background: #0b1510;
+      box-shadow: var(--shadow), 0 0 0 1px rgba(255,255,255,.16);
+      z-index: 4;
+    }
+
+    .watch .media-frame { border-radius: 50%; }
+
+    .free-strip {
+      border-block: 1px solid var(--line);
+      background: rgba(143,224,173,.045);
+    }
+
+    .free-strip-inner {
+      min-height: 118px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      gap: 24px;
+    }
+
+    .proof-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .proof-item b {
+      display: block;
+      color: var(--ink);
+      font-size: 1.04rem;
+    }
+
+    .proof-icon {
+      flex: 0 0 auto;
+      width: 38px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: #062313;
+      background: var(--green);
+      font-weight: 950;
+    }
+
+    section { position: relative; }
+
+    .section-pad { padding-block: clamp(88px, 12vw, 150px); }
+
+    .section-heading {
+      max-width: 760px;
+      margin-bottom: 54px;
+    }
+
+    .section-heading h2 {
+      margin-bottom: 18px;
+      font-size: clamp(2.5rem, 5vw, 4.7rem);
+      font-weight: 950;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.12rem;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .feature-card {
+      grid-column: span 4;
+      min-height: 280px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(145deg, rgba(143,224,173,.07), transparent 42%),
+        var(--surface);
+      box-shadow: inset 0 1px rgba(255,255,255,.04);
+    }
+
+    .feature-card.wide { grid-column: span 8; }
+
+    .feature-number {
+      width: 46px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      margin-bottom: 54px;
+      border: 1px solid rgba(143,224,173,.23);
+      border-radius: 15px;
+      color: var(--green);
+      background: rgba(143,224,173,.08);
+      font-weight: 950;
+    }
+
+    .feature-card h3 {
+      margin-bottom: 12px;
+      font-size: 1.55rem;
+    }
+
+    .feature-card p { margin: 0; color: var(--muted); }
+
+    .product-story {
+      display: grid;
+      grid-template-columns: minmax(320px, .9fr) minmax(0, 1.1fr);
+      align-items: center;
+      gap: clamp(50px, 9vw, 120px);
+    }
+
+    .story-media {
+      position: relative;
+      max-width: 470px;
+      margin-inline: auto;
+    }
+
+    .story-phone {
+      position: relative;
+      width: min(340px, 78vw);
+      aspect-ratio: 9 / 19.5;
+      margin-inline: auto;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 48px;
+      background: #111914;
+      box-shadow: var(--shadow);
+    }
+
+    .story-phone .media-frame { border-radius: 39px; }
+
+    .story-badge {
+      position: absolute;
+      right: -14%;
+      top: 18%;
+      max-width: 210px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(16, 37, 25, .92);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      font-size: .88rem;
+      font-weight: 800;
+    }
+
+    .story-badge span { display: block; color: var(--green); font-size: 1.55rem; }
+
+    .story-copy h2 {
+      margin-bottom: 22px;
+      font-size: clamp(2.5rem, 5vw, 4.9rem);
+      font-weight: 950;
+    }
+
+    .story-copy > p { color: var(--muted); font-size: 1.12rem; }
+
+    .story-list {
+      display: grid;
+      gap: 18px;
+      margin: 36px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .story-list li {
+      display: grid;
+      grid-template-columns: 43px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .story-list .tick {
+      width: 43px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      color: var(--green);
+      background: rgba(143,224,173,.09);
+      font-weight: 950;
+    }
+
+    .story-list strong { display: block; margin-top: 2px; }
+    .story-list small { color: var(--muted); font-size: .94rem; }
+
+    .wear-panel {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: clamp(40px, 7vw, 90px);
+      padding: clamp(36px, 6vw, 72px);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 38px;
+      background:
+        radial-gradient(circle at 78% 40%, rgba(143,224,173,.20), transparent 20rem),
+        linear-gradient(135deg, rgba(255,255,255,.045), transparent),
+        var(--surface-solid);
+      box-shadow: var(--shadow);
+    }
+
+    .wear-copy h2 {
+      margin-bottom: 18px;
+      font-size: clamp(2.5rem, 4.8vw, 4.6rem);
+      font-weight: 950;
+    }
+
+    .wear-copy p { color: var(--muted); font-size: 1.1rem; }
+
+    .wear-visual {
+      min-height: 390px;
+      display: grid;
+      place-items: center;
+    }
+
+    .watch-large {
+      position: relative;
+      width: min(340px, 68vw);
+      aspect-ratio: 1;
+      padding: 15px;
+      border: 17px solid #263a2e;
+      border-radius: 50%;
+      background: #080e0a;
+      box-shadow: 0 35px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.18);
+    }
+
+    .watch-large::before,
+    .watch-large::after {
+      content: "";
+      position: absolute;
+      width: 38%;
+      height: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: -1;
+      background: linear-gradient(90deg, #15251b, #2d4335, #15251b);
+    }
+
+    .watch-large::before { bottom: 94%; border-radius: 22px 22px 6px 6px; }
+    .watch-large::after { top: 94%; border-radius: 6px 6px 22px 22px; }
+    .watch-large .media-frame { border-radius: 50%; }
+
+    .privacy {
+      border-top: 1px solid var(--line);
+      background: linear-gradient(to bottom, rgba(255,255,255,.018), transparent 20rem);
+    }
+
+    .privacy-layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: clamp(40px, 8vw, 100px);
+      align-items: start;
+    }
+
+    .privacy-nav {
+      position: sticky;
+      top: 108px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(20,39,29,.58);
+    }
+
+    .privacy-nav strong {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--green);
+      font-size: .78rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .privacy-nav a {
+      display: block;
+      padding: 8px 0;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .92rem;
+      font-weight: 700;
+    }
+
+    .privacy-nav a:hover { color: var(--ink); }
+
+    .privacy-copy { max-width: 800px; }
+
+    .privacy-copy h2 {
+      margin-bottom: 12px;
+      font-size: clamp(2.7rem, 5vw, 4.8rem);
+      font-weight: 950;
+    }
+
+    .policy-meta {
+      margin: 0 0 42px;
+      color: var(--muted);
+    }
+
+    .privacy-summary {
+      margin-bottom: 48px;
+      padding: 24px;
+      border: 1px solid rgba(143,224,173,.25);
+      border-radius: 22px;
+      color: var(--green-strong);
+      background: rgba(143,224,173,.07);
+      font-size: 1.06rem;
+      font-weight: 700;
+    }
+
+    .policy-section {
+      padding-block: 28px;
+      border-top: 1px solid var(--line);
+    }
+
+    .policy-section h3 {
+      margin-bottom: 15px;
+      font-size: 1.55rem;
+      letter-spacing: -.025em;
+    }
+
+    .policy-section p,
+    .policy-section li { color: var(--muted); }
+
+    .policy-section ul { padding-left: 22px; }
+    .policy-section li + li { margin-top: 8px; }
+    .policy-section strong { color: var(--ink); }
+    .policy-section a { color: var(--green); text-underline-offset: 3px; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      min-width: 640px;
+      border-collapse: collapse;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { color: var(--ink); }
+
+    .contact-callout {
+      margin-top: 24px;
+      padding: 22px;
+      border: 1px solid rgba(255,198,90,.25);
+      border-radius: 20px;
+      background: rgba(255,198,90,.06);
+    }
+
+    .contact-callout strong { color: var(--amber); }
+
+    footer {
+      padding-block: 40px;
+      border-top: 1px solid var(--line);
+      color: var(--dim);
+      font-size: .9rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .footer-links { display: flex; flex-wrap: wrap; gap: 18px; }
+    .footer-links a { color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--ink); }
+
+    @media (max-width: 960px) {
+      .hero {
+        min-height: auto;
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy { max-width: 760px; }
+      .showcase { width: min(620px, 100%); margin-inline: auto; }
+      .free-strip-inner { grid-template-columns: 1fr 1fr; padding-block: 28px; }
+      .feature-card, .feature-card.wide { grid-column: span 6; }
+      .product-story { grid-template-columns: 1fr; }
+      .story-media { order: 2; }
+      .wear-panel { grid-template-columns: 1fr; }
+      .privacy-layout { grid-template-columns: 1fr; }
+      .privacy-nav { position: static; display: none; }
+    }
+
+    @media (max-width: 650px) {
+      .container { width: min(calc(100% - 28px), var(--max)); }
+      .nav { min-height: 66px; }
+      .nav-links a:not(:last-child) { display: none; }
+      .hero { padding-block: 62px 90px; }
+      h1 { font-size: clamp(3rem, 17vw, 5.25rem); }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+      .showcase { min-height: 560px; }
+      .phone-main { right: 0; }
+      .phone-back { left: -8%; }
+      .watch { width: 150px; }
+      .free-strip-inner { grid-template-columns: 1fr; gap: 16px; }
+      .feature-card, .feature-card.wide { grid-column: 1 / -1; }
+      .feature-card { min-height: 240px; }
+      .feature-number { margin-bottom: 38px; }
+      .story-badge { right: -4%; }
+      .wear-panel { padding: 32px 20px; border-radius: 26px; }
+      .wear-visual { min-height: 320px; }
+      .privacy-copy h2 { overflow-wrap: anywhere; }
+      .footer-inner { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .phone-main { animation: float-phone 6s ease-in-out infinite; }
+      .watch { animation: float-watch 5s ease-in-out infinite .4s; }
+      @keyframes float-phone {
+        0%, 100% { transform: rotate(4deg) translateY(0); }
+        50% { transform: rotate(3deg) translateY(-12px); }
+      }
+      @keyframes float-watch {
+        0%, 100% { transform: translateY(0) rotate(0); }
+        50% { transform: translateY(-9px) rotate(2deg); }
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Discore home">
+        <span class="brand-mark" aria-hidden="true">🥏</span>
+        <span>Discore</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#wear-os">Wear OS</a>
+        <a href="#privacy">Privacy</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div id="top" class="hero container">
+      <div class="hero-copy">
+        <p class="eyebrow">Android + Wear OS</p>
+        <h1>Count throws.<br><span class="gradient-text">Not subscriptions.</span></h1>
+        <p class="hero-lead">
+          The <strong>totally free, no-bullshit disc golf scoring app</strong>.
+          Unlimited scorecards, useful course data and live scoring from your wrist. No ads. No account. No paywall. Ever. ;)
+        </p>
+        <div class="actions">
+          <a class="button button-primary" href="https://play.google.com/store/apps/details?id=com.xerxz.discore" rel="noopener">Get it free on Google Play <span aria-hidden="true">↗</span></a>
+          <a class="button button-secondary" href="#features">See what it does <span aria-hidden="true">↓</span></a>
+        </div>
+        <ul class="micro-proof" aria-label="Key benefits">
+          <li>Unlimited scorecards</li>
+          <li>Offline scoring</li>
+          <li>Optional location</li>
+        </ul>
+      </div>
+
+      <div class="showcase" aria-label="Discore shown on a phone and smartwatch">
+        <div class="phone phone-back" aria-hidden="true">
+          <div class="media-frame" data-placeholder="Upload media/phone-scorecard.webp">
+            <img src="media/phone-scorecard.webp" alt="Discore full scorecard on Android" onerror="this.style.display='none'">
+          </div>
+        </div>
+        <div class="phone phone-main">
+          <div class="media-frame" data-placeholder="Upload media/phone-home.webp">
+            <img src="media/phone-home.webp" alt="Discore home screen with recent courses and round options" onerror="this.style.display='none'">
+          </div>
+        </div>
+        <div class="watch">
+          <div class="media-frame" data-placeholder="Upload Wear OS image">
+            <img src="media/wear-scoring.webp" alt="Live disc golf scoring with Discore on Wear OS" onerror="this.style.display='none'">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="free-strip" aria-label="Discore promises">
+      <div class="free-strip-inner container">
+        <div class="proof-item"><span class="proof-icon">∞</span><span><b>Unlimited</b>Scorecards</span></div>
+        <div class="proof-item"><span class="proof-icon">0</span><span><b>Zero</b>Ads &amp; analytics</span></div>
+        <div class="proof-item"><span class="proof-icon">✓</span><span><b>No account</b>Just start playing</span></div>
+        <div class="proof-item"><span class="proof-icon">⌚</span><span><b>Wear OS</b>Score from your wrist</span></div>
+      </div>
+    </aside>
+
+    <section id="features" class="section-pad container">
+      <div class="section-heading">
+        <p class="eyebrow">Everything you need</p>
+        <h2>Less tapping.<br>More throwing.</h2>
+        <p>Discore stays out of your way during the round and keeps the details you actually care about.</p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card wide">
+          <div class="feature-number">01</div>
+          <h3>Start with real hole data</h3>
+          <p>Find nearby courses and start with available hole count, par and distance data. Your two most-played courses become instant shortcuts.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-number">02</div>
+          <h3>Fast live scoring</h3>
+          <p>Big, readable controls made for cold hands, bright sun and keeping pace with the card.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-number">03</div>
+          <h3>Works offline</h3>
+          <p>Keep scoring without reception. Your rounds and cached course information stay on your device.</p>
+        </article>
+        <article class="feature-card wide">
+          <div class="feature-number">04</div>
+          <h3>Free means free</h3>
+          <p>No scorecard limit. No premium tier. No banner ads between holes. No account wall before the first tee.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-pad">
+      <div class="product-story container">
+        <div class="story-media">
+          <div class="story-phone">
+            <div class="media-frame" data-placeholder="Upload media/phone-scoring.webp">
+              <img src="media/phone-scoring.webp" alt="Live score entry screen in Discore" loading="lazy" onerror="this.style.display='none'">
+            </div>
+          </div>
+          <div class="story-badge"><span>2 taps</span>to update a score and move on</div>
+        </div>
+        <div class="story-copy">
+          <p class="eyebrow">Built for the tee pad</p>
+          <h2>Your round.<br>Your rhythm.</h2>
+          <p>Pick a course, add your group and play. Scores are stored locally, so your history stays available even when the course has one bar of signal—or none.</p>
+          <ul class="story-list">
+            <li><span class="tick">✓</span><span><strong>Custom players and pars</strong><small>Set up the card the way your group actually plays.</small></span></li>
+            <li><span class="tick">✓</span><span><strong>Dark mode included</strong><small>System, light and dark themes—saved for next time.</small></span></li>
+            <li><span class="tick">✓</span><span><strong>Your favorites learn themselves</strong><small>The two courses you play most rise to the top automatically.</small></span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="wear-os" class="section-pad container">
+      <div class="wear-panel">
+        <div class="wear-copy">
+          <p class="eyebrow">Leave the phone in the bag</p>
+          <h2>Score it<br>from your wrist.</h2>
+          <p>Your active round follows you to a paired Wear OS watch. Add throws, move between holes and keep the card moving without reaching for your phone.</p>
+          <ul class="micro-proof">
+            <li>Live round sync</li>
+            <li>Simple watch controls</li>
+            <li>Included for free</li>
+          </ul>
+        </div>
+        <div class="wear-visual">
+          <div class="watch-large">
+            <div class="media-frame" data-placeholder="Upload media/wear-scoring.webp">
+              <img src="media/wear-scoring.webp" alt="Discore score controls on a round Wear OS watch" loading="lazy" onerror="this.style.display='none'">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy" class="privacy section-pad">
+      <div class="privacy-layout container">
+        <nav class="privacy-nav" aria-label="Privacy policy sections">
+          <strong>On this page</strong>
+          <a href="#policy-overview">Overview</a>
+          <a href="#policy-data">Data on your device</a>
+          <a href="#policy-location">Location &amp; course search</a>
+          <a href="#policy-wear">Wear OS</a>
+          <a href="#policy-third-parties">Third parties</a>
+          <a href="#policy-control">Your controls</a>
+          <a href="#policy-site">This website</a>
+          <a href="#policy-contact">Contact</a>
+        </nav>
+
+        <article class="privacy-copy">
+          <p class="eyebrow">Plain-English policy</p>
+          <h2>Privacy Policy</h2>
+          <p class="policy-meta">Effective: 20 August 2026 &nbsp;·&nbsp; App: Discore for Android and Wear OS</p>
+
+          <div id="policy-overview" class="privacy-summary">
+            The short version: Discore has no account system, ads or developer-operated analytics. Scores and player names are stored locally. Approximate location is optional and is only used to find nearby courses. Discore does not sell personal data.
+          </div>
+
+          <section class="policy-section">
+            <h3>1. Who is responsible</h3>
+            <p>This policy applies to the Discore mobile and Wear OS apps and this promotional website. The app publisher and data controller is <strong>YOUR LEGAL NAME OR STUDIO</strong> (“Discore”, “we”, “us”). Contact details are provided at the end of this policy.</p>
+          </section>
+
+          <section id="policy-data" class="policy-section">
+            <h3>2. Data stored on your device</h3>
+            <p>Discore stores the information needed to run the app locally on your Android phone:</p>
+            <ul>
+              <li>player names you enter;</li>
+              <li>course names, hole definitions, pars, distances and scores;</li>
+              <li>active and completed rounds;</li>
+              <li>app settings such as theme, default players and screen-awake preference;</li>
+              <li>cached nearby-course results, course coordinates and the approximate origin of the latest course search.</li>
+            </ul>
+            <p>We do not operate an account or cloud database for this information and do not receive it on a Discore server. Android may include app data in device or cloud backups depending on your Android and Google backup settings.</p>
+          </section>
+
+          <section id="policy-location" class="policy-section">
+            <h3>3. Optional approximate location</h3>
+            <p>Discore requests Android’s <strong>approximate location</strong> permission so it can sort and find disc golf courses near you. The permission is optional; manual scorecards work without it. Discore does not request background location or precise GPS permission.</p>
+            <p>When nearby-course search runs, latitude and longitude are included in a search sent to a public Overpass API endpoint. The endpoint can therefore receive the query coordinates, your IP address, app identifier, device/network metadata and request time in its normal server logs. No player names or scorecards are included in that request.</p>
+            <p>The latest search origin is saved locally to decide whether cached course data should be refreshed. It remains on the device until app data is cleared or the app is uninstalled, subject to Android backup behavior.</p>
+          </section>
+
+          <section id="policy-wear" class="policy-section">
+            <h3>4. Wear OS synchronization</h3>
+            <p>If you use the Wear OS app, the active round—including course, players, holes and scores—is synchronized between your paired phone and watch through Google Play Services’ Wearable Data Layer. This is required to score from the watch. Discore does not send this information to a developer-operated server.</p>
+          </section>
+
+          <section id="policy-third-parties" class="policy-section">
+            <h3>5. Services involved</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Service</th><th>Why it is used</th><th>Data it may process</th></tr></thead>
+                <tbody>
+                  <tr><td>OpenStreetMap / public Overpass operators</td><td>Find nearby disc golf courses</td><td>Search coordinates, IP address and standard request metadata</td></tr>
+                  <tr><td>Google Play Services</td><td>Approximate device location and phone/watch synchronization</td><td>Data required by the relevant Android and Wear OS services under Google’s terms</td></tr>
+                  <tr><td>Google Play</td><td>App distribution, updates and store operation</td><td>Store and device data handled by Google under its own policy</td></tr>
+                  <tr><td>GitHub Pages</td><td>Hosts this static website</td><td>Visitor IP addresses are logged by GitHub for security purposes</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>These providers act under their own terms and privacy policies. Learn more in the <a href="https://osmfoundation.org/wiki/Privacy_Policy" rel="noopener">OpenStreetMap Foundation Privacy Policy</a>, <a href="https://policies.google.com/privacy" rel="noopener">Google Privacy Policy</a> and <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub Privacy Statement</a>.</p>
+          </section>
+
+          <section class="policy-section">
+            <h3>6. What Discore does not include</h3>
+            <p>The current version of Discore contains no advertising SDK, no developer-operated analytics or telemetry SDK, no social login and no in-app account system. We do not sell, rent or use personal data for targeted advertising.</p>
+          </section>
+
+          <section class="policy-section">
+            <h3>7. Retention and security</h3>
+            <p>Local round history and settings remain on your device until you delete them, clear the app’s storage or uninstall the app. Cached data may be replaced as course searches are refreshed. Data is protected by Android’s application sandbox and your device security. No method of storage or transmission can be guaranteed completely secure.</p>
+          </section>
+
+          <section id="policy-control" class="policy-section">
+            <h3>8. Your choices and deletion controls</h3>
+            <ul>
+              <li>Deny or revoke approximate location in Android Settings; manual scoring remains available.</li>
+              <li>Clear completed round history from <strong>Discore → Settings → Data → Clear history</strong>.</li>
+              <li>Clear all local Discore data through Android’s app settings or uninstall the app.</li>
+              <li>Manage Android backup and restore behavior in your device’s Google backup settings.</li>
+              <li>Disconnect or uninstall the Wear OS app to stop watch synchronization.</li>
+            </ul>
+            <p>Because we do not keep a Discore account or developer-operated user database, we generally have no remote player profile or score history to retrieve or delete for you. You may still contact us with any privacy question or rights request.</p>
+          </section>
+
+          <section class="policy-section">
+            <h3>9. Children</h3>
+            <p>Discore is a general sports utility and is not directed to children under 13. We do not knowingly collect children’s personal information through a Discore account or backend because neither exists. Parents and guardians should manage app permissions and device backups for younger users.</p>
+          </section>
+
+          <section id="policy-site" class="policy-section">
+            <h3>10. This website</h3>
+            <p>This is a static website. It sets no first-party cookies and includes no custom analytics, advertising pixels, contact forms or externally hosted fonts. If it is hosted on GitHub Pages, GitHub states that visitor IP addresses are logged and stored for security purposes. If tracking, forms or other services are added later, this policy must be updated before they are enabled.</p>
+          </section>
+
+          <section class="policy-section">
+            <h3>11. Changes to this policy</h3>
+            <p>We may update this policy when Discore’s features, dependencies or legal obligations change. The effective date at the top will be revised. Material changes should also be communicated through the app listing or another reasonable channel.</p>
+          </section>
+
+          <section id="policy-contact" class="policy-section">
+            <h3>12. Contact</h3>
+            <p>For privacy questions or requests, contact:</p>
+            <div class="contact-callout">
+              <strong>Xerxz</strong><br>
+              Email: <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a><br>
+            </div>
+          </section>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner container">
+      <span>© 2026 Discore. Built for birdies, bogeys and everything between.</span>
+      <div class="footer-links">
+        <a href="#privacy">Privacy Policy</a>
+        <a href="mailto:xerxz5115@gmail.com">Contact</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
