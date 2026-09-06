@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sea Drifter — Privacy Policy</title>
+<style>
+  :root{
+    --ink:#0c1b2e; --paper:#f4efe0; --sea:#123a5a; --sea-deep:#0a1522;
+    --gold:#c69e4a; --line:#d9cfae; --muted:#4a5a6a;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; padding:0; background:var(--sea-deep); color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:48px 22px 80px}
+  header{
+    background:linear-gradient(180deg,var(--sea) 0%,var(--sea-deep) 100%);
+    border-bottom:3px solid var(--gold);
+  }
+  header .wrap{padding-bottom:36px}
+  h1{margin:0 0 6px; font-size:30px; letter-spacing:.5px; color:var(--paper)}
+  header p{margin:0; color:#bcd3e0; font-size:15px}
+  main{background:var(--paper)}
+  main .wrap{padding-top:40px}
+  h2{
+    margin:38px 0 10px; font-size:19px; color:var(--sea);
+    border-bottom:1px solid var(--line); padding-bottom:6px;
+  }
+  h2:first-of-type{margin-top:0}
+  a{color:#0a5a86}
+  code{background:#e9e2cb; padding:1px 5px; border-radius:4px; font-size:.92em}
+  .lead{font-size:17px}
+  .callout{
+    background:#eae3cc; border-left:4px solid var(--gold);
+    padding:14px 16px; border-radius:6px; margin:18px 0;
+  }
+  ul{padding-left:22px}
+  li{margin:6px 0}
+  footer{color:var(--muted); font-size:13px; margin-top:44px; border-top:1px solid var(--line); padding-top:16px}
+  .tag{display:inline-block; background:var(--sea); color:var(--paper); font-size:12px;
+       padding:2px 9px; border-radius:999px; margin-right:6px; letter-spacing:.3px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Sea Drifter — Privacy Policy</h1>
+    <p>Effective date: 6 September 2026 &nbsp;·&nbsp; Last updated: 6 September 2026</p>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <p class="lead">
+    <strong>Sea Drifter does not collect, store, transmit, or sell any personal
+    information.</strong> There are no user accounts, no advertising, no
+    analytics, and no third-party tracking. This policy explains what that means
+    in practice.
+  </p>
+
+  <div class="callout">
+    <span class="tag">Short version</span>
+    The game runs on your device. Your progress is saved only on your device.
+    The optional co-operative mode connects two devices directly over your own
+    local network. Nothing is sent to us or to anyone else.
+  </div>
+
+  <h2>1. Who this policy covers</h2>
+  <p>
+    This policy applies to the <strong>Sea Drifter</strong> mobile application
+    ("the game", "the app") published for Android on Google Play and for iOS /
+    iPadOS on the Apple App Store by <strong>&#10216;Your name / studio&#10217;</strong>
+    ("we", "us"). It does not cover the separate PC version distributed on Steam
+    (see <em>Section 7</em>).
+  </p>
+
+  <h2>2. Information we collect</h2>
+  <p>
+    <strong>None.</strong> The app contains no analytics SDK, no crash-reporting
+    SDK, no advertising SDK, and no social or login integrations. We have no
+    servers that receive data from the app. We do not ask for your name, e-mail,
+    phone number, contacts, photos, microphone, camera, precise or coarse
+    location, or advertising identifiers, and the app does not request those
+    permissions.
+  </p>
+
+  <h2>3. Information stored on your device</h2>
+  <p>The game writes two files to its private app storage:</p>
+  <ul>
+    <li><code>save.json</code> — your voyage: ship state, inventory, gold,
+      upgrades, discovered map, records.</li>
+    <li><code>settings.json</code> — audio volumes and display preferences.</li>
+  </ul>
+  <p>
+    These files stay in the app's own sandbox on your device. They are not
+    readable by us or by other apps, are not backed up to any service we
+    control, and are permanently deleted when you uninstall the app or clear the
+    app's data. (Your device operating system may include them in a
+    user-initiated system backup that you control, for example an encrypted
+    iCloud or Google device backup. We never see that backup.)
+  </p>
+
+  <h2>4. Local multiplayer (co-op)</h2>
+  <p>
+    Sea Drifter offers an optional drop-in co-operative mode. When you host or
+    join a co-op game:
+  </p>
+  <ul>
+    <li>Devices discover each other by sending a small broadcast message on your
+      local Wi-Fi network (UDP port 27019), or by you typing another device's
+      local IP address and port directly.</li>
+    <li>Game data (ship positions, loot, combat events, and a display name you
+      choose, which may simply be "Player 2") is exchanged
+      <strong>directly between the participating devices</strong> over that
+      local connection.</li>
+    <li>An IP address is used only, and only for as long as needed, to keep that
+      direct connection open. It is not written to disk and is never sent to us
+      or to any third party.</li>
+    <li>There is no matchmaking server, no lobby service, and no internet relay.
+      If the two devices are not on the same local network, co-op will not
+      connect.</li>
+  </ul>
+  <p>
+    Because messages travel over a local network you control, keep co-op play to
+    networks you trust.
+  </p>
+
+  <h2>5. Internet access</h2>
+  <p>
+    The Android build declares the <code>INTERNET</code> permission. It is used
+    solely to open local-network sockets for the co-op mode described above. The
+    app makes no outbound calls to any website, API, or content server, and
+    displays no web content.
+  </p>
+
+  <h2>6. Children's privacy</h2>
+  <p>
+    Sea Drifter is suitable for players aged roughly 10 and up (stylised,
+    bloodless ship-to-ship combat). It is not directed at children under 13, and
+    because the app collects no data at all, it collects no data from children.
+    It is not enrolled in Google Play's <em>Designed for Families</em> programme
+    or Apple's <em>Kids</em> category.
+  </p>
+
+  <h2>7. Third parties</h2>
+  <ul>
+    <li><strong>Google Play / Apple App Store</strong> distribute the app and
+      may collect their own data (downloads, purchases, crash logs, aggregate
+      analytics) under
+      <a href="https://policies.google.com/privacy">Google's</a> and
+      <a href="https://www.apple.com/legal/privacy/">Apple's</a> respective
+      privacy policies. We receive only anonymous, aggregate statistics from
+      those dashboards (for example, total installs by country). We cannot
+      identify you from them.</li>
+    <li><strong>Steam version:</strong> the separate PC edition of Sea Drifter
+      integrates with Steam for features such as achievements and is subordinate
+      to the
+      <a href="https://store.steampowered.com/privacy_agreement/">Valve / Steam
+      Privacy Policy</a>. That integration is not present in the mobile app this
+      policy covers.</li>
+  </ul>
+
+  <h2>8. Data security</h2>
+  <p>
+    Since we hold no user data, there is no server-side database to breach.
+    On-device save files are protected by your device's own app-sandboxing and
+    storage encryption.
+  </p>
+
+  <h2>9. Your rights</h2>
+  <p>
+    You are in full control of the only data that exists: the local save. You
+    can erase it at any time from the in-game menu ("New Voyage" overwrites it),
+    by clearing the app's storage in your device settings, or by uninstalling
+    the app. We have nothing to export or delete on your behalf because we hold
+    nothing.
+  </p>
+
+  <h2>10. Changes to this policy</h2>
+  <p>
+    If a future update adds any feature that changes how data is handled (for
+    example optional online play, crash reporting, or analytics), we will update
+    this policy, change the "Last updated" date above, and describe the change
+    in the app's store release notes before that version ships.
+  </p>
+
+  <h2>11. Contact</h2>
+  <p>
+    Questions about this policy or your privacy:<br>
+    <strong>&#10216;support@your-domain&#10217;</strong><br>
+    <strong>&#10216;Your name / studio&#10217;</strong>, &#10216;postal address if
+    required by your jurisdiction&#10217;
+  </p>
+
+  <footer>
+    This document is provided for the Google Play and Apple App Store listings of
+    Sea Drifter. Replace every &#10216;placeholder&#10217; with real details and
+    host it at a stable public URL before submitting.
+  </footer>
+
+</div>
+</main>
+</body>
+</html>
