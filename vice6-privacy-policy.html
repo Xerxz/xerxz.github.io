@@ -75,6 +75,11 @@
       margin: 8px 0;
     }
 
+    ul {
+      margin: 8px 0;
+      padding-left: 22px;
+    }
+
     a {
       color: var(--accent);
       text-decoration: none;
@@ -111,7 +116,7 @@
 <body>
   <main>
     <h1>Privacy Policy</h1>
-    <p class="updated">Vice 6 Companion &middot; Last updated: November 14, 2026</p>
+    <p class="updated">Vice 6 Companion &middot; Last updated: November 18, 2026</p>
 
     <p>
       Vice 6 Companion ("the app") is an unofficial, fan-made companion for
@@ -120,11 +125,53 @@
       app handles.
     </p>
 
-    <h2>No account, no tracking of our own</h2>
+    <h2>No tracking of our own</h2>
     <p>
-      The app has no sign-in and does not run its own analytics, profiles or
-      servers. The countdown, intel, news and the offline community map are
-      bundled in the app.
+      The app does not run its own analytics. The countdown, intel, news and
+      the offline community map are bundled in the app and work without an
+      account. Only the optional Squad feature, described below, uses an
+      account.
+    </p>
+
+    <h2>Squad (optional account)</h2>
+    <p>
+      Squad lets you add friends and tell them when you start playing. If
+      you sign in to Squad with Apple, Google or email, the app stores the
+      following using Google Firebase (Authentication, Cloud Firestore,
+      Cloud Functions and Cloud Messaging):
+    </p>
+    <ul>
+      <li>your sign-in identifier and the email address provided by Apple, Google or you;</li>
+      <li>the display name and optional PSN ID you enter;</li>
+      <li>your friend code, friends list, friend requests and blocked players;</li>
+      <li>your check-ins (chosen activity, preset note, start and end time) and preset reactions you send;</li>
+      <li>your time zone, used to avoid notifications at night;</li>
+      <li>a push notification token for your device;</li>
+      <li>reports you file about other players, kept for moderation.</li>
+    </ul>
+    <p>
+      Your friends can see your display name, PSN ID and current check-in.
+      Other signed-in players can see your display name if they have your
+      friend code. Squad does not connect to your PlayStation Network
+      account and never asks for its password. This data is not used for
+      advertising and is not sold.
+    </p>
+    <p>
+      Notifications are delivered through Firebase Cloud Messaging and the
+      Apple or Google notification services. You can mute any friend in the
+      app or turn notifications off in your device settings.
+    </p>
+
+    <h2>Deleting your Squad account</h2>
+    <p>
+      You can delete your Squad account at any time in the app under
+      <strong>Squad &rarr; profile icon &rarr; Delete squad account</strong>.
+      This permanently removes your profile, friends, check-ins, requests,
+      reactions, push tokens and sign-in record. You can also request
+      deletion by emailing
+      <a href="mailto:xerxz5115@gmail.com">xerxz5115@gmail.com</a> from the
+      address on your account. Reports about rule-breaking may be kept for
+      up to 90 days to handle abuse, then deleted.
     </p>
 
     <h2>Data stored on your device</h2>
@@ -176,14 +223,18 @@
     <h2>Children</h2>
     <p>
       The app covers a mature-rated game and is not directed to children
-      under 13. We do not knowingly collect data from children.
+      under 13. Squad requires users to confirm they are 13 or older. We do
+      not knowingly collect data from children; if you believe a child has
+      created a Squad account, contact us and we will delete it.
     </p>
 
     <h2>Your choices</h2>
     <p>
       You can change ad consent in the app, reset or limit your advertising
       ID in your device settings, restore or manage Premium in your store
-      account, and delete all locally stored data by uninstalling the app.
+      account, mute friends or turn off notifications, delete your Squad
+      account in the app, and delete all locally stored data by
+      uninstalling the app.
     </p>
 
     <h2>Changes</h2>
